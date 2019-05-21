@@ -4,10 +4,11 @@
 \alias{LoadGeneSets}
 \title{LoadGeneSets}
 \usage{
-LoadGeneSets(file_location, groupnames = c("MClust_1", "MClust_26",
-  "MClust_3457"), P.cutoff = 1.3, Mol.cutoff = 5, Source = "IPA",
+LoadGeneSets(file_location = canonical.files,
+  groupnames = c("MClust_1", "MClust_26", "MClust_3457"),
+  P.cutoff = 1.3, Mol.cutoff = 5, Source = "IPA",
   Great.Background = F, type = "Canonical_Pathways", topranks = "",
-  structure = "SYMBOL", Organism = "org.Hs.eg.db", seperator = ",")
+  structure = "SYMBOL", Organism = "org.Mm.eg.db", seperator = ",")
 }
 \arguments{
 \item{file_location}{A location string in a vector.}

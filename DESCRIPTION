@@ -1,8 +1,7 @@
 Package: GeneSetCluster
 Type: Package
-Title: This is a package meant to be used to cluster together Gene-Sets
-        from pathway tools to aid in biological interpretation
-Version: 1.0.0
+Title: Cluster together Gene-Sets from Gene Set Analysis
+Version: 1.0.1
 Author: Ewoud Ewing
 Maintainer: Ewoud Ewing <ewoud.ewing@ki.se>
 Description: This is a package meant to be used to cluster together Gene-Sets from pathway tools such as Ingenuity Pathway Aanalysis (IPA) (https://www.qiagenbioinformatics.com/products/ingenuity-pathway-analysis/) and GREAT (http://great.stanford.edu/public/html/index.php). Gene-Sets often appear significant when running such tools with different labels displaying different Gene-Sets.
@@ -13,10 +12,10 @@ Encoding: UTF-8
 LazyData: true
 Depends: R (>= 2.10)
 Imports: limma, stats, methods, RColorBrewer, clusterProfiler,
-        pheatmap, readxl, mclust, org.Hs.eg.db, org.Mm.eg.db
+        pheatmap, readxl, org.Hs.eg.db, org.Mm.eg.db
 Suggests: RUnit, BiocGenerics, knitr (>= 1.6), rmarkdown, BiocStyle (>=
         1.3), roxygen2, doSNOW
 VignetteBuilder: knitr
 RoxygenNote: 6.1.1
 NeedsCompilation: no
-Packaged: 2019-05-07 15:18:44 UTC; ewoewi
+Packaged: 2019-05-21 11:51:03 UTC; ewoewi

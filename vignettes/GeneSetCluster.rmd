@@ -15,32 +15,42 @@ vignette: >
 
 ```{r setup, include=FALSE}
 require(GeneSetCluster)
+require(limma)
+require(RColorBrewer)
+require(pheatmap)
+require(readxl)
+require(org.Hs.eg.db)
+require(org.Mm.eg.db)
 
 ```
 
 # GeneSetCluster Package example data
 This is the demonstration of the R package GeneSetCluster
 
-This is a package meant to be used to cluster together Gene-Sets from pathway tools such as Ingenuity Pathway Aanalysis (IPA) (https://www.qiagenbioinformatics.com/products/ingenuity-pathway-analysis/) and GREAT (http://great.stanford.edu/public/html/index.php). Gene-Sets often appear significant when running such tools with different labels displaying different Gene-Sets.
+This is a package meant to be used to cluster together Gene-Sets from pathway tools such as Ingenuity Pathway Aanalysis (IPA) (https://www.qiagenbioinformatics.com/products/ingenuity-pathway-analysis/) and GREAT (http://great.stanford.edu/public/html/index.php), GSEA (http://software.broadinstitute.org/gsea/index.jsp) and others. Gene-Sets often appear significant when running such tools with different labels displaying different Gene-Sets.
 
-However, it can become difficult to interpret the output sometimes when the data of several gene sets compared. Furthermore the output data has several limitations: 
-1)	Low ratio: where there are only a few genes enriched. 
+Sometimes, interpreting the output is difficult, which can be made worse whenof several gene sets analysis are compared. 
+
+The output data has several limitations: 
+1)	Low ratio: where there are only a few genes enriched.
+
 2)	High similarity: where the different genes sets that appear have the same genes enriched despite the different labels. 
+
 3)	Low overlap: where the same gene set labels appear in different experimental settings but different genes are enriched. 
 
-So its better to review theses sets of genes together instead of investigating the many different Gene-Sets individually. This package does this by taking the sets of genes of every Gene-Set and calculates the Relative Risk of them appearing together. This is used as a distance between them, the higher it is the greater overlap they have. This distance score is then used to cluster the Gene-Sets together.
 
-The data is taken from https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE111385
+Consequently, it is preferable to review the gene set analysis experiment as a whole instead of investigating the many different Gene-Sets individually. Furthermore, analysing multiple gene set analysis is also improved by combining the different experiments. This package does this by taking the sets of genes of every Gene-Set and calculates the distance between them. By default this package uses a relative risk, the higher it is the greater overlap they have. This distance score is then used to cluster the Gene-Sets together.
+
+Example data is taken from https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE111385
+
 Data has been analysed with Deseq2 pipeline where the data is Transcriptome sequencing of WT and conditional-Tgfbr2 knockout microglia and CNS-repopulating monocyte-derived macrophages from C57BL/6 mouse in triplicates. The genes were picked in a comparison of uG vs Mac in both WT and KO with a 1E-06 pvalue cutoff. Genes were analysed in both IPA with the Canonical pathways and functional annotations were exported into a excel file with default settings. 
 Bed files were also generated for the genes, and uploaded in GREAT with a background of the sequencing samples. All data was exported in tsv format. 
-
-Exported files were stored in the files: ~/Project9/ProjectData_MM10/GREAT/ and ~/Project9/ProjectData_MM10/IPA/
 
 ##Pipeline  
 ![Pipeline of the Package](img/Pipeline.png)
 
 ##Loading the data
-We start with creating the PathwayObject. This can be done using the automatic loader (LoadGeneSets) or with ObjectCreator. ObjectCreator needs just a vector of Gene-Sets labels, a vector with genes (as a string for each Gene-Set), a vector with each group every Gene-Set belongs to (e.g. KO or WT), it needs the Source (e.g. IPA), it needs the Type (e.g. Canonical pathways), structure (e.g. SYMBOL), and seperator (sep) (How is are the strings of the genes seperated). Gene-Sets labels, Genes and Groups need the same length. Everything else is just a single string. See example below in 1.7.
+Core to the pipeline is the PathwayObject. This can be generated using the automatic loader (LoadGeneSets) or with ObjectCreator. ObjectCreator needs just a vector of Gene-Sets labels, a vector with genes (as a string for each Gene-Set), a vector with each group every Gene-Set belongs to (e.g. KO or WT), it needs the Source (e.g. IPA), it needs the Type (e.g. Canonical pathways), structure (e.g. SYMBOL), and seperator (sep) (How is are the strings of the genes seperated). Gene-Sets labels, Genes and Groups need the same length. Everything else is just a single string. See example below in 1.7.
 
 The LoadGeneSets function has all this automated, currently the LoadGeneSets function supports loading GREAT TSV files (As exported as "all data as TSV").
 ![exporting GREAT](img/Great.png)
@@ -48,10 +58,15 @@ The LoadGeneSets function has all this automated, currently the LoadGeneSets fun
 
 As well as IPA canonical pathways (exported as excel) or Functional annotations (exported as excel).
 
-![exporting IPA](img/IPA.PNG)
+![exporting IPA](img/IPA.png)
 
 
-The remaining info includes: Pvalue cutoff, the minimum number of molecules per Gene-Set (Recommended >= 5), The source, if great was run with a background, the type for GREAT doenst matter as it runs 18 diferent types that the loader automatically assigns. But for IPA its important. The great output is really really large. Recommended is that the topranks be given. Meaning you only look at the top Gene-Sets. The structure structure (e.g. SYMBOL, this is important as the combinePathways check that all the data is in the same structure). As well as the organims (so it can correctly convert the structure, the name has to be of the name of the package installed of which to call. Currently supported is the org.Mm.eg.db and org.Hs.eg.db packages). Last but not least is the seperator. How are the genes combined in a string. 
+
+While exporting the dat afrom GREAT or IPA the data is not filtered, there for the loader filters the data. It needs a  Pvalue cutoff. In IPA the pvalue in Canonical Pathways is given as a -log10 pvalue, if the P.cutoff is larger than 1 the loader assumes that the pvalues are -log10 transformed. The  minimum number of genes (or molecules) per Gene-Set (Recommended >= 5), the data source. If GREAT was run the program needs to know  wether GREAT was run with a background. The type of data (Canonical Pathways, Functional analysis etc). for GREAT doenst matter as it runs 18 diferent types that the loader automatically assigns. 
+
+The GREAT output is really really large, so the tool itself by default displays the top 20 ranks, this can be emulated by using the topranks. The structure e.g. SYMBOL, this is important as the combinePathways check that all the data is in the same structure and convert if neccesary, which is why it needs the Organism. Currently supported is the org.Mm.eg.db and org.Hs.eg.db packages. Last but not least is the seperator, for seperating the genes from the string.
+
+Note the package suitable for 1 gene set analysis as well as multiple. To load 1 experiment, link to the file using file_location and supply just 1 groupnames. For multiple experiments use more than 1.
 
 ##Loading GREAT
 ###Loading GREAT data
@@ -70,9 +85,9 @@ Great.bckgnrd.Object1 <- LoadGeneSets(file_location = Great.files.bckgrnd,
                               P.cutoff = 0.05, 
                               Mol.cutoff = 5,
                               Source = "Great",
-                              Great.Background = T,#specify the background, as great has a different output if run with or without background
+                              Great.Background = T,
                               type = "Canonical_Pathways",
-                              topranks = 20,#Great gives soo much output, recommended is adding a topranks filter for first 20
+                              topranks = 20,
                               structure = "SYMBOL",
                               Organism = "org.Mm.eg.db",
                               seperator = ",")
@@ -82,7 +97,7 @@ Great.bckgnrd.Object1 <- LoadGeneSets(file_location = Great.files.bckgrnd,
 
 
 ###Plot Overlap of Gene-Sets labels
-Here we can see the overlap between the different labels in the Disease Ontology output
+Recommende is to inspect the labels, if there are multiple experiments the labels can be compared.
 ```{r Venndiagram, echo=FALSE}
 par(mfrow=c(2,1))
 VennDiagram(n_groups = 2, 
@@ -99,15 +114,17 @@ VennDiagram(n_groups = 2,
 ```
 
 ###Investigate the metafiles
-Does this look like the experiment that we designed?
+Check the experiment data and the metainfo to make sure that the PathwayObject matches your experiment(s).
+
 ```{r Great with Background meta }
 
 ShowExperimentdata(Object =Great.bckgnrd.Object1 )
 ShowMeta(Object = Great.bckgnrd.Object1 )
 
 ```
+
 ###Manage Gene-Sets
-If the data is as desired, you can continue with the combinePathway function, if not we can select types of interest using managePathways. In this case we are interested in Disease Ontology and Go Biological Process, so we managePathways to keep those data types and remove the others.
+Following loading of the PathwayObject the distance can be calculated in the combinePathway function. If the data is very large, data can be managed by selecting for types of interest using ManageGeneSets In this example we are interested in Disease Ontology and Go Biological Process, so we ManageGeneSets to keep those data types and remove the others. The result of the ManageGeneSets we can see using ShowExperimentdata and ShowMeta.
 
 ```{r Great with Background manage clusters}
 
@@ -118,18 +135,35 @@ ShowExperimentdata(Object =man.Great.Object1 )
 ShowMeta(Object =man.Great.Object1 )
 ```
 ###Combine and cluster
-Here we combine and cluster the Gene-Sets. The CombineGeneSets function  calculates the distance between Gene-Sets which is further used for clustering. The distance by default is a Relative Risk (RR), however if desired a user supplied functuon can also be provided (see 1.4.6). The clustering can be done in 6 ways, kmeans, Kmeans per group, mclust, mclust per group, hierarchical, and hierarchical per group. depending on the data different clustering methods work better.
+Following all the setup of the pathwayObject we can now combine and cluster the Gene-Sets. The CombineGeneSets function  calculates the distance between Gene-Sets which is further used for clustering. The distance by default is a Relative Risk (RR), however if desired a user supplied functuon can also be provided (see 1.4.6). The clustering can be done in 4 ways, kmeans, Kmeans per group, hierarchical, and hierarchical per group. depending on the data different clustering methods work better. As for how many clusters your data requires, is depended on your data. It is recommended that you use a trial and error approach to detereming the optimal number of clusters.
+
+Combine object gives you the option to display a condensed version of the data or an expanded one with groups being compared or seperated. ClusterGeneSets furthermore gives you the option to filter for unique molecular signatures. This can be usefull for experiments where the same gene signature appears a lot. 
+
+Advised is to not filter for unique molecular signature when the display is set to Condensed. This will lead to a loss of information. Advised is to set display to Expanded before filtering for unique molecular signatures.
 
 ```{r Great with Background combine and cluster }
 
-man.Great.Object2 <- CombineGeneSets(Object = man.Great.Object1)
+man.Great.Object2 <- CombineGeneSets(Object = man.Great.Object1, 
+                                     combineMethod = "Standard",
+                                     display = "condensed")
 man.Great.Object3 <- ClusterGeneSets(Object = man.Great.Object2, 
                                  clusters = 5, 
-                                 method = "kmeans")
+                                 method = "kmeans", 
+                                 order = "cluster", 
+                                 molecular.signature = "All")
+
+man.Great.Object2.expanded <- CombineGeneSets(Object = man.Great.Object1, 
+                                     combineMethod = "Standard",
+                                     display = "Expanded")
+man.Great.Object3.expanded <- ClusterGeneSets(Object = man.Great.Object2.expanded, 
+                                 clusters = 5, 
+                                 method = "kmeans", 
+                                 order = "cluster", 
+                                 molecular.signature = "All")
 ```
 
 ###Plot The great RR with background clusters
-Using the PlotPathways function Object3 can be plotted into a heatmap with a bar for Group and cluster, allowing you to identify the groups. If desired you can add the annotation of the genes and Gene-Sets names using annotation.mol. Also the data is scaled. When there are very large Gene-Sets involved the scales of the RR can be very large. E.g. some Gene-Sets have a RR of >750 while other small ones are ~30. This makes it difficult to distuingish the different clusters. Use the RRmax function to scale the RR to the max desired. 
+Using the PlotPathways function on the PathwayObject plots a heatmap with a bar for Group and cluster, allowing you to identify the groups. If desired you can add the annotation of the genes and Gene-Sets names using annotation.mol. Also the data is scaled. When there are very large Gene-Sets involved the scales of the RR can be very large. E.g. some Gene-Sets have a RR of >750 while other small ones are ~30. This makes it difficult to distuingish the different clusters. Use the RRmax function to scale the RR to the max desired. 
 
 
 ```{r plotPathways, echo=FALSE}
@@ -143,13 +177,23 @@ PlotGeneSets(Object =man.Great.Object3, fontsize = 3,
             annotation.mol=F,
             RR.max = 60,
             main="Great_Background clustered with Kmeans \n Disease Ontology and GO Biological Process")
+
+
+PlotGeneSets(Object =man.Great.Object3.expanded, fontsize = 3,
+            legend = T,
+            annotation.mol=F,
+            RR.max = 60,
+            main="Great_Background clustered with Kmeans \n Disease Ontology and GO Biological Process")
+
+
 ```
-Here we can see there there are 5 clusters and while there are overlapping sets of genes between the different experiments, within each experiment there are several clusters which would make more sense to view together, in this case there are 5 sets to investigate because kmeans was set to 5, but every data sets needs to be investigated to identify the optimal number of clusters. Mclust can find the optimal number of clusters required but you can set an maximum. 
+
+At the moment there is no plugin to deterermine the optimal number of clusters, therefor the user is advised to run several numbers of clusters to determine the optimal, e.g. a loop with different number of clusters plotted into a pdf.
 
 
 ##IPA
 ###Loading IPA data
-When Loading IPA data we seperate between Canonical Pathways and Functional Anotations. 
+When Loading IPA data we seperate between Canonical Pathways and Functional Anotations, as the source files have a different structure. 
 
 ```{r load IPA}
 
@@ -160,26 +204,26 @@ IPA.files <- c(system.file("extdata", "MM10.IPA.KO.uGvsMac.Canonical_pathways.xl
                  system.file("extdata", "MM10.IPA.WT.uGvsMac.Functional_annotations.xls", package = "GeneSetCluster"))
 canonical.files <- IPA.files[grep("Canonical", IPA.files)]
 
-IPA.object1 <- LoadGeneSets(file_location = canonical.files, #where are  the files
-                            groupnames= c("KO", "WT"),#Names of the groups 
-                            P.cutoff = 1.3, #minumum cutoff if smaller than 1 it assumes normal pvalue, if larger than 1 it assumes a log10 palue
-                            Mol.cutoff = 5,# amount of molecules interested in 
-                            Source = "IPA",#How was the data generated
-                            type = "Canonical_Pathways",#What is the experiment e.g. canonical pathways, functional anotation
-                            structure = "SYMBOL",#structure of the molecules e.g. genenames, ensembl_ID etc 
-                            seperator = ",")#How are the genes seperated
+IPA.object1 <- LoadGeneSets(file_location = canonical.files, 
+                            groupnames= c("Canonical.KO", "Canonical.WT"),
+                            P.cutoff = 1.3, 
+                            Mol.cutoff = 5,
+                            Source = "IPA",
+                            type = "Canonical_Pathways",
+                            structure = "SYMBOL",
+                            seperator = ",")
 
 ```
 ###Plot Overlap of pathway labels
-Here we can see the overlap between the different labels in the IPA canonical output.
+Using the VennDiagram it is possible to see the overlap between the different labels in the IPA canonical output.
 
-Nearly all the labels from KO are in the WT experiment. But lets see if based on the genes within those labels thats still true, if those Gene sets cluster together.
+Nearly all the labels from KO are in the WT experiment. Nonetheless the labels are not as important as the genes which cause this gene set to be enriched.
 
 
 ```{r Venndiagram IPA Pathways, echo=FALSE}
 VennDiagram(n_groups = 2, 
-               Group1 = as.character(IPA.object1@Data$KO$Pathways), 
-               Group2 =as.character(IPA.object1@Data$WT$Pathways), 
+               Group1 = as.character(IPA.object1@Data$Canonical.KO$Pathways), 
+               Group2 =as.character(IPA.object1@Data$Canonical.WT$Pathways), 
                names_groups = c("KO", "WT"),
                main = "Overlapping IPA pathway labels",legend = F, percentage = F )
 
@@ -201,7 +245,8 @@ Here we combine and cluster the IPA output using kmeans.
 
 ```{r combine and cluseter IPA Pathways}
 
-IPA.object2 <- CombineGeneSets(Object = IPA.object1)
+IPA.object2 <- CombineGeneSets(Object = IPA.object1,
+                               display = "Expanded")
 
 IPA.object3 <- ClusterGeneSets(Object = IPA.object2, 
                                clusters = 12, 
@@ -215,19 +260,35 @@ When running the data we can ask it wether a certain set of genes ar emore appea
 
 #Highlighting Redox Genes
 system.file("data", "Redox.genes.rda", package = "testdat")
-IPA.object3.highlight <- HighlightGeneSets(Object = IPA.object3, highligt.genes = Redox.genes, name = "Ros")
+IPA.object3.highlight <- HighlightGeneSets(Object = IPA.object3, 
+                                           highligt.genes = Redox.genes, 
+                                           name = "Ros")
 
 ```
 ###Plot The IPA canonical RR with highlights clusters
-
+These highlighted genes add a bar with highlight to the plot
 
 ```{r PlotPathways with highlight, echo=FALSE}
+
+PlotGeneSets(Object =IPA.object3, fontsize = 3,
+            legend = T,
+            annotation.mol=F,
+            RR.max = 60,
+            main="IPA canonical")
 
 PlotGeneSets(Object =IPA.object3.highlight, fontsize = 3,
             legend = T,
             annotation.mol=F,
             RR.max = 60,
-            main="IPA canonical RR with highlights clusters")
+            main="IPA canonical with highlights clusters")
+```
+
+THis highlight can also be seen using ShowGeneSets. Note the ShowGeneSets returns a data.frame, use of head(), tail() etc to not overwhelm the console with data.
+
+```{r display data with highlight, echo=FALSE}
+
+ShowGeneSets(IPA.object3.highlight)[1:5,]
+
 ```
 
 
@@ -265,7 +326,7 @@ PlotGeneSets(Object = IPA.Object.J, fontsize =5,
 
 
 ##Loading the IPA functional annotations 
-GeneSetCluster can load many types of data, including Canonical Pathways it can also automatically load Functional annotations. 
+Using GeneSetCluster to load Functional annotations is possible by adding Functional_annotations to type.
 Specify in the loader that these are functional annotations and set the Pvalue cutoff accordingly. Using default settings Canonical pathways are exported with -log10 transformed Pvalues, meaning the larger is more significant, while functional annotations are exported with untransformed pvalues. 
 
 
@@ -278,24 +339,23 @@ Specify in the loader that these are functional annotations and set the Pvalue c
 
 functional.files <- IPA.files[grep("Functional", IPA.files)]
 
-IPA.Functional.object1 <- LoadGeneSets(file_location = functional.files, #where are  the files
-                                 groupnames= c("KO", "WT"),#Names of the groups 
-                                 P.cutoff = 0.05, #minumum cutoff if smaller than 1 it assumes normal pvalue, if larger than 1 it assumes a log10 palue
-                                 Mol.cutoff = 5,# amount of molecules interested in 
-                                 Source = "IPA",#How was the data generated
-                                 type = "Functional_annotations",#What is the experiment e.g. canonical pathways, Functional_annotations
-                                 structure = "SYMBOL",#structure of the molecules e.g. genenames, ensembl_ID etc 
-                                 seperator = ",")#How are the genes seperated
+IPA.Functional.object1 <- LoadGeneSets(file_location = functional.files, 
+                                 groupnames= c("Functional.KO", "Functional.WT"),
+                                 P.cutoff = 0.05, 
+                                 Mol.cutoff = 5,
+                                 Source = "IPA",
+                                 type = "Functional_annotations",
+                                 structure = "SYMBOL",
+                                 seperator = ",")
 ```
 
 ###Plot Overlap of functions labels
-Here we can see the overlap between the different labels in the IPA functional output
-Many functional annotations labels are shared. 
+Using VennDiagram we can see the overlap between the different labels in the IPA functional output. Many functional annotations labels are shared while the Canonical Pathways showed different results. 
 
 ```{r Venndiagram IPA functions}
 VennDiagram(n_groups = 2, 
-               Group1 = as.character(IPA.Functional.object1@Data$KO$Pathways), 
-               Group2 =as.character(IPA.Functional.object1@Data$WT$Pathways), 
+               Group1 = as.character(IPA.Functional.object1@Data$Functional.KO$Pathways), 
+               Group2 =as.character(IPA.Functional.object1@Data$Functional.WT$Pathways), 
                names_groups = c("KO", "WT"),
                main = "Overlapping IPA functions labels",legend = F, percentage = F )
 
@@ -314,19 +374,20 @@ ShowMeta(Object = IPA.Functional.object1 )
 ```
 
 ###IPA Combining and clustering functional Gene-Sets
-Here we combine and cluster the IPA functional output using mclust. Here the are a maximum number of clusters is 12, but mclust determines that the optimal clustering is 8 clusters. 
 
+This functional object works the same as the rest.
 ```{r combine and cluseter IPA functional Gene-Sets}
 
-IPA.Functional.object2 <- CombineGeneSets(Object = IPA.Functional.object1)
+IPA.Functional.object2 <- CombineGeneSets(Object = IPA.Functional.object1, 
+                                          display = "Expanded")
 
 IPA.Functional.object3 <- ClusterGeneSets(Object = IPA.Functional.object2, 
-                               clusters = 12, 
-                               method = "mclust")
+                               clusters = 8, 
+                               method = "kmeans")
 
 ```
 ###Plot The IPA functional RR
-Plotting the different Pathways where you can see the different clusters.  This time using mclust. 
+Plotting the different Pathways shows that it works the same to investigate the different clusters. 
 
 ```{r plotPathways with functional, echo=FALSE}
 
@@ -335,11 +396,11 @@ PlotGeneSets(Object = IPA.Functional.object3,
             legend = T,
             annotation.mol=F,
             RR.max = 60,
-            main="IPA functional RR with mclust clusters")
+            main="IPA functional with kmeans clusters")
 ```
 
 ##Merging the canonical pathways and functional annotations
-When we have 2 datasets and we want to compare, we can merge together 2 object1 files into an merged object1. This way we can compare the different datasets. But also between different tools, e.g. IPA and Great outputs can be compared.  It warns when different tools or types are merged.
+When there are 2 different PathwayObjects, because of different loadings or different types, the pipeline allows for merging together multiple PathwayObjec into an merged object.  If multiple objects need to be merged the function has to be run several times. It warns when different tools or types are merged.
 
 
 ```{r merge datasets IPA}
@@ -354,14 +415,15 @@ ShowMeta(Object = Ipa.merged.object1 )
 
 ```
 ###Combine and cluster merged data
-We can now combine and cluster the results. Of note here is of course the time it takes growths exponentially with larger datasets, so the merged data takes longer than the seperate data sets.
+Following merging the pipeline combines and clusters the results. Of note here is of course the time it takes growths exponentially with larger datasets, so the merged data takes longer than the seperate data sets.
 
 ```{r merge datasets combine and cluster IPA}
 
-Ipa.merged.object2 <- CombineGeneSets(Object = Ipa.merged.object1)
+Ipa.merged.object2 <- CombineGeneSets(Object = Ipa.merged.object1,
+                                      display="Expanded")
 
 Ipa.merged.object3 <- ClusterGeneSets(Object = Ipa.merged.object2, 
-                                          clusters = 12, 
+                                          clusters = 14, 
                                           method = "kmeans")
 
 ```
@@ -369,7 +431,7 @@ Ipa.merged.object3 <- ClusterGeneSets(Object = Ipa.merged.object2,
 
 ###Merged Data in Object3
 Now the data sets are merged and compared. 
-These are completely normal Objects now. So we can also highlight the object same as we done before.
+These are completely normal PathwayObjects now. So we can also highlight the object same as we done before.
 
 ```{r highlight dataset merged}
 Ipa.merged.object3.highlight <- HighlightGeneSets(Object = Ipa.merged.object3, highligt.genes = Redox.genes, name = "Ros")
@@ -380,7 +442,7 @@ Ipa.merged.object3.highlight <- HighlightGeneSets(Object = Ipa.merged.object3, h
 
 We can plot these results from the highlighted merged 12 kmeans clusters.
 
-In the heatmap:
+In the heatmap with the expanded display clearly shows the difference between the different clusters. 
 
 
 ```{r plotPathways with merged, echo=FALSE}
@@ -395,22 +457,22 @@ PlotGeneSets(Object =Ipa.merged.object3.highlight, fontsize = 3,
 
 ##Export the combined pathways and RR
 
-We can say we want just the clustered pathways, or we want to have a look at both the RR and the clustered pathways. It writes it in the folder assigned to file_location and it takes the name of Name and writes it into a CSV file with seperation of ";", to make it readable by Excel.
+Exporting the files is done using the WriteGeneSets. It writes it in the folder assigned to file_location and it takes the name of Name and writes it into a CSV file with seperation of ";", to make it readable by Excel.
 
 
 ```{r write merged output to file}
 
-WriteGeneSets(Object = Ipa.merged.object3.highlight, file_location = "~/Project9/ProjectData_MM10/", name = "Ipa.merged.object3.highlight", write = "Both")
+WriteGeneSets(Object = Ipa.merged.object3.highlight, file_location = getwd(), name = "Ipa.merged.object3.highlight", write = "Both")
 ```
 
 
 ##Creating object with custom table
-When data wasnt run in GREAT or IPA the aproach can still be used. In fact it doesnt neccesary need to be proper pathways. The thing the code needs is a group, a name, and name content. Plus some meta info. We can also simulate a dataset.
+When data wasnt run in GREAT or IPA the pipeline can still be used. In fact it doesnt neccesary need to be proper pathways. The thing the code needs is a group, a name, and name content. Plus some meta info. It is possible to simulate a dataset.
 
 
 ###Creating random pathway data
 
-We can create a random data set. Assign the names as Pathway_1 etc. With the genes inside just being Gene_1 to Gene_200.
+Simulation starts with generating a random data set. Assign the names as Pathway_1 etc. With the genes inside just being Gene_1 to Gene_200.
 ```{r Creating random pathway data}
 
 Test.object <- matrix(data = NA, nrow = 50, ncol = 3)
@@ -440,15 +502,15 @@ head(Test.object)
 
 
 ###Creating object with custom table
-We can input this in the Object creator to generate a proper GeneSetCluster Object. 
+This simulated dataset is then inputted into the ObjectCreator to generate a proper PathwayObject. 
 ```{r creating random pathway Object}
 
 Test.object1 <- ObjectCreator(Pathways = Test.object[,1], 
                               Molecules = Test.object[,2], 
                               Groups = Test.object[,3],
-                              Source = "Random",#we randomly generated this data
-                              type = "Test",
-                              structure = "SYMBOL",
+                              Source = "Random",
+                              Type = "Random",
+                              structure = "SYMBOL",organism ="Org.HS.eg.db",
                               sep = ",")#neccesay to seperate the different genes for combinations.
 ShowExperimentdata(Object = Test.object1)
 ShowMeta(Object = Test.object1)

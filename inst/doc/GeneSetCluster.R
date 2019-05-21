@@ -1,5 +1,11 @@
 ## ----setup, include=FALSE--------------------------------------------------
 require(GeneSetCluster)
+require(limma)
+require(RColorBrewer)
+require(pheatmap)
+require(readxl)
+require(org.Hs.eg.db)
+require(org.Mm.eg.db)
 
 
 ## ----Great with Background load--------------------------------------------
@@ -16,9 +22,9 @@ Great.bckgnrd.Object1 <- LoadGeneSets(file_location = Great.files.bckgrnd,
                               P.cutoff = 0.05, 
                               Mol.cutoff = 5,
                               Source = "Great",
-                              Great.Background = T,#specify the background, as great has a different output if run with or without background
+                              Great.Background = T,
                               type = "Canonical_Pathways",
-                              topranks = 20,#Great gives soo much output, recommended is adding a topranks filter for first 20
+                              topranks = 20,
                               structure = "SYMBOL",
                               Organism = "org.Mm.eg.db",
                               seperator = ",")
@@ -55,10 +61,23 @@ ShowMeta(Object =man.Great.Object1 )
 
 ## ----Great with Background combine and cluster-----------------------------
 
-man.Great.Object2 <- CombineGeneSets(Object = man.Great.Object1)
+man.Great.Object2 <- CombineGeneSets(Object = man.Great.Object1, 
+                                     combineMethod = "Standard",
+                                     display = "condensed")
 man.Great.Object3 <- ClusterGeneSets(Object = man.Great.Object2, 
                                  clusters = 5, 
-                                 method = "kmeans")
+                                 method = "kmeans", 
+                                 order = "cluster", 
+                                 molecular.signature = "All")
+
+man.Great.Object2.expanded <- CombineGeneSets(Object = man.Great.Object1, 
+                                     combineMethod = "Standard",
+                                     display = "Expanded")
+man.Great.Object3.expanded <- ClusterGeneSets(Object = man.Great.Object2.expanded, 
+                                 clusters = 5, 
+                                 method = "kmeans", 
+                                 order = "cluster", 
+                                 molecular.signature = "All")
 
 ## ----plotPathways, echo=FALSE----------------------------------------------
 PlotGeneSets(Object =man.Great.Object3, fontsize = 3,
@@ -72,6 +91,15 @@ PlotGeneSets(Object =man.Great.Object3, fontsize = 3,
             RR.max = 60,
             main="Great_Background clustered with Kmeans \n Disease Ontology and GO Biological Process")
 
+
+PlotGeneSets(Object =man.Great.Object3.expanded, fontsize = 3,
+            legend = T,
+            annotation.mol=F,
+            RR.max = 60,
+            main="Great_Background clustered with Kmeans \n Disease Ontology and GO Biological Process")
+
+
+
 ## ----load IPA--------------------------------------------------------------
 
 
@@ -81,20 +109,20 @@ IPA.files <- c(system.file("extdata", "MM10.IPA.KO.uGvsMac.Canonical_pathways.xl
                  system.file("extdata", "MM10.IPA.WT.uGvsMac.Functional_annotations.xls", package = "GeneSetCluster"))
 canonical.files <- IPA.files[grep("Canonical", IPA.files)]
 
-IPA.object1 <- LoadGeneSets(file_location = canonical.files, #where are  the files
-                            groupnames= c("KO", "WT"),#Names of the groups 
-                            P.cutoff = 1.3, #minumum cutoff if smaller than 1 it assumes normal pvalue, if larger than 1 it assumes a log10 palue
-                            Mol.cutoff = 5,# amount of molecules interested in 
-                            Source = "IPA",#How was the data generated
-                            type = "Canonical_Pathways",#What is the experiment e.g. canonical pathways, functional anotation
-                            structure = "SYMBOL",#structure of the molecules e.g. genenames, ensembl_ID etc 
-                            seperator = ",")#How are the genes seperated
+IPA.object1 <- LoadGeneSets(file_location = canonical.files, 
+                            groupnames= c("Canonical.KO", "Canonical.WT"),
+                            P.cutoff = 1.3, 
+                            Mol.cutoff = 5,
+                            Source = "IPA",
+                            type = "Canonical_Pathways",
+                            structure = "SYMBOL",
+                            seperator = ",")
 
 
 ## ----Venndiagram IPA Pathways, echo=FALSE----------------------------------
 VennDiagram(n_groups = 2, 
-               Group1 = as.character(IPA.object1@Data$KO$Pathways), 
-               Group2 =as.character(IPA.object1@Data$WT$Pathways), 
+               Group1 = as.character(IPA.object1@Data$Canonical.KO$Pathways), 
+               Group2 =as.character(IPA.object1@Data$Canonical.WT$Pathways), 
                names_groups = c("KO", "WT"),
                main = "Overlapping IPA pathway labels",legend = F, percentage = F )
 
@@ -109,7 +137,8 @@ ShowMeta(Object =IPA.object1 )
 
 ## ----combine and cluseter IPA Pathways-------------------------------------
 
-IPA.object2 <- CombineGeneSets(Object = IPA.object1)
+IPA.object2 <- CombineGeneSets(Object = IPA.object1,
+                               display = "Expanded")
 
 IPA.object3 <- ClusterGeneSets(Object = IPA.object2, 
                                clusters = 12, 
@@ -120,16 +149,29 @@ IPA.object3 <- ClusterGeneSets(Object = IPA.object2,
 
 #Highlighting Redox Genes
 system.file("data", "Redox.genes.rda", package = "testdat")
-IPA.object3.highlight <- HighlightGeneSets(Object = IPA.object3, highligt.genes = Redox.genes, name = "Ros")
+IPA.object3.highlight <- HighlightGeneSets(Object = IPA.object3, 
+                                           highligt.genes = Redox.genes, 
+                                           name = "Ros")
 
 
 ## ----PlotPathways with highlight, echo=FALSE-------------------------------
+
+PlotGeneSets(Object =IPA.object3, fontsize = 3,
+            legend = T,
+            annotation.mol=F,
+            RR.max = 60,
+            main="IPA canonical")
 
 PlotGeneSets(Object =IPA.object3.highlight, fontsize = 3,
             legend = T,
             annotation.mol=F,
             RR.max = 60,
-            main="IPA canonical RR with highlights clusters")
+            main="IPA canonical with highlights clusters")
+
+## ----display data with highlight, echo=FALSE-------------------------------
+
+ShowGeneSets(IPA.object3.highlight)[1:5,]
+
 
 ## ----User supplied distance calculations-----------------------------------
 
@@ -168,19 +210,19 @@ PlotGeneSets(Object = IPA.Object.J, fontsize =5,
 
 functional.files <- IPA.files[grep("Functional", IPA.files)]
 
-IPA.Functional.object1 <- LoadGeneSets(file_location = functional.files, #where are  the files
-                                 groupnames= c("KO", "WT"),#Names of the groups 
-                                 P.cutoff = 0.05, #minumum cutoff if smaller than 1 it assumes normal pvalue, if larger than 1 it assumes a log10 palue
-                                 Mol.cutoff = 5,# amount of molecules interested in 
-                                 Source = "IPA",#How was the data generated
-                                 type = "Functional_annotations",#What is the experiment e.g. canonical pathways, Functional_annotations
-                                 structure = "SYMBOL",#structure of the molecules e.g. genenames, ensembl_ID etc 
-                                 seperator = ",")#How are the genes seperated
+IPA.Functional.object1 <- LoadGeneSets(file_location = functional.files, 
+                                 groupnames= c("Functional.KO", "Functional.WT"),
+                                 P.cutoff = 0.05, 
+                                 Mol.cutoff = 5,
+                                 Source = "IPA",
+                                 type = "Functional_annotations",
+                                 structure = "SYMBOL",
+                                 seperator = ",")
 
 ## ----Venndiagram IPA functions---------------------------------------------
 VennDiagram(n_groups = 2, 
-               Group1 = as.character(IPA.Functional.object1@Data$KO$Pathways), 
-               Group2 =as.character(IPA.Functional.object1@Data$WT$Pathways), 
+               Group1 = as.character(IPA.Functional.object1@Data$Functional.KO$Pathways), 
+               Group2 =as.character(IPA.Functional.object1@Data$Functional.WT$Pathways), 
                names_groups = c("KO", "WT"),
                main = "Overlapping IPA functions labels",legend = F, percentage = F )
 
@@ -196,11 +238,12 @@ ShowMeta(Object = IPA.Functional.object1 )
 
 ## ----combine and cluseter IPA functional Gene-Sets-------------------------
 
-IPA.Functional.object2 <- CombineGeneSets(Object = IPA.Functional.object1)
+IPA.Functional.object2 <- CombineGeneSets(Object = IPA.Functional.object1, 
+                                          display = "Expanded")
 
 IPA.Functional.object3 <- ClusterGeneSets(Object = IPA.Functional.object2, 
-                               clusters = 12, 
-                               method = "mclust")
+                               clusters = 8, 
+                               method = "kmeans")
 
 
 ## ----plotPathways with functional, echo=FALSE------------------------------
@@ -210,7 +253,7 @@ PlotGeneSets(Object = IPA.Functional.object3,
             legend = T,
             annotation.mol=F,
             RR.max = 60,
-            main="IPA functional RR with mclust clusters")
+            main="IPA functional with kmeans clusters")
 
 ## ----merge datasets IPA----------------------------------------------------
 
@@ -225,10 +268,11 @@ ShowMeta(Object = Ipa.merged.object1 )
 
 ## ----merge datasets combine and cluster IPA--------------------------------
 
-Ipa.merged.object2 <- CombineGeneSets(Object = Ipa.merged.object1)
+Ipa.merged.object2 <- CombineGeneSets(Object = Ipa.merged.object1,
+                                      display="Expanded")
 
 Ipa.merged.object3 <- ClusterGeneSets(Object = Ipa.merged.object2, 
-                                          clusters = 12, 
+                                          clusters = 14, 
                                           method = "kmeans")
 
 
@@ -246,7 +290,7 @@ PlotGeneSets(Object =Ipa.merged.object3.highlight, fontsize = 3,
 
 ## ----write merged output to file-------------------------------------------
 
-WriteGeneSets(Object = Ipa.merged.object3.highlight, file_location = "~/Project9/ProjectData_MM10/", name = "Ipa.merged.object3.highlight", write = "Both")
+WriteGeneSets(Object = Ipa.merged.object3.highlight, file_location = getwd(), name = "Ipa.merged.object3.highlight", write = "Both")
 
 ## ----Creating random pathway data------------------------------------------
 
@@ -279,9 +323,9 @@ head(Test.object)
 Test.object1 <- ObjectCreator(Pathways = Test.object[,1], 
                               Molecules = Test.object[,2], 
                               Groups = Test.object[,3],
-                              Source = "Random",#we randomly generated this data
-                              type = "Test",
-                              structure = "SYMBOL",
+                              Source = "Random",
+                              Type = "Random",
+                              structure = "SYMBOL",organism ="Org.HS.eg.db",
                               sep = ",")#neccesay to seperate the different genes for combinations.
 ShowExperimentdata(Object = Test.object1)
 ShowMeta(Object = Test.object1)

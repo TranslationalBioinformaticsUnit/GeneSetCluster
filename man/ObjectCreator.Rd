@@ -4,8 +4,8 @@
 \alias{ObjectCreator}
 \title{ObjectCreator}
 \usage{
-ObjectCreator(Pathways, Molecules, Groups, Source, type, structure,
-  Organism = NA, seperator)
+ObjectCreator(Pathways, Molecules, Groups, Source, Type, structure, sep,
+  organism = NA)
 }
 \arguments{
 \item{Pathways}{A vector with Gene-Set labels.}
@@ -16,9 +16,9 @@ ObjectCreator(Pathways, Molecules, Groups, Source, type, structure,
 
 \item{Source}{Tool used to generate gene sets..}
 
-\item{type}{For IPA data if Canonical pathways or Functional Anotations were supplied.}
-
 \item{structure}{The structure of the genes. is it SYMBOLS, ENSEMBL, NCBI etc. Used for converting when there is mutiple structure in the object.}
+
+\item{type}{For IPA data if Canonical pathways or Functional Anotations were supplied.}
 
 \item{Organism}{the package name for the human or mouse data, used for converting the gene structure. name of the package, currently org.Hs.eg.db and org.Mm.eg.db supported.}
 

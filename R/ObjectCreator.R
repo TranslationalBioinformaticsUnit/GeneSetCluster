@@ -51,7 +51,7 @@
 #'
 
 #'
-ObjectCreator <- function(Pathways, Molecules, Groups, Source, type, structure, Organism = NA, seperator)
+ObjectCreator <- function(Pathways, Molecules, Groups, Source, Type, structure, sep, organism = NA)
 {
   message("[=========================================================]")
   message("[<<<<            ObjectCreator START                 >>>>>]")
@@ -60,18 +60,18 @@ ObjectCreator <- function(Pathways, Molecules, Groups, Source, type, structure, 
   #--------Data-----------#
   ###########################
 
-  Data <- matrix(NA, nrow=length(Pathways), ncol = 7)
-  colnames(Data) <- c("Pathways", "Molecules","type", "Groups", "Pval", "Ratio", "MoleculesCount")
+  Data <- matrix(NA, nrow=length(Pathways), ncol = 8)
+  colnames(Data) <- c("Pathways", "Molecules","Type", "Groups", "Pval", "Ratio", "MoleculesCount", "GeneSet")
   Data <- as.data.frame(Data)
 
   Data$Pathways <- Pathways
   Data$Molecules <- Molecules
   Data$Groups <- Groups
-  Data$type <- rep(type, times = nrow(Data))
+  Data$Type <- rep(Type, times = nrow(Data))
 
   for(can.i in 1:nrow(Data))
   {
-    Data[can.i,"MoleculesCount"]<- length(as.vector(strsplit2(as.character(Data[can.i,"Molecules"]), split=seperator)))
+    Data[can.i,"MoleculesCount"]<- length(as.vector(strsplit2(as.character(Data[can.i,"Molecules"]), split=sep)))
   }
 
   ###########################
@@ -79,7 +79,7 @@ ObjectCreator <- function(Pathways, Molecules, Groups, Source, type, structure, 
   ###########################
   Pdata <- matrix(NA,nrow=length(unique(Groups)), ncol = 3)
   colnames(Pdata) <- c("Groupnames", "Length", "file_location")
-  rownames(Pdata) <- paste("Experiment",1:length(unique(Groups)), seperator="_" )
+  rownames(Pdata) <- paste("Experiment",1:length(unique(Groups)), sep="_" )
   Pdata <- as.data.frame(Pdata)
 
   Pdata$Groupnames <- unique(Groups)
@@ -88,20 +88,22 @@ ObjectCreator <- function(Pathways, Molecules, Groups, Source, type, structure, 
   ###########################
   #--------metadata-----------#
   ###########################
-  metadata <- matrix(NA, nrow = length(unique(Groups)), ncol = 10)
-  colnames(metadata) <- c("source", "type", "structure", "Organism", "seperator", "Data", "cluster.method", "highlight", "order.group", "loaded")
-  rownames(metadata) <- paste("Experiment",1:length(unique(Groups)), seperator="_" )
+  metadata <- matrix(NA, nrow = length(unique(Groups)), ncol = 12)
+  colnames(metadata) <- c("source", "type", "structure", "organism", "seperator", "Data",
+                          "cluster.method", "highlight", "order.group", "loaded", "display", "mol.signature")
+  rownames(metadata) <- paste("Experiment",1:length(unique(Groups)), sep="_" )
   metadata <- as.data.frame(metadata)
 
   metadata$structure <- structure
-  metadata$Organism <- Organism
+  metadata$organism <- organism
 
   metadata$source <- Source
-  metadata$type <- type
-  metadata$seperator <- rep(seperator, times = nrow(metadata))
+  metadata$type <- Type
+  metadata$seperator <- rep(sep, times = nrow(metadata))
   metadata$Data <- rep("DF", times = nrow(metadata))
   metadata$loaded <- rep("Manual", times = nrow(metadata))
-
+  metadata[,"display"] <- rep("Condensed", times = nrow(metadata))
+  metadata[,"mol.signature"] <- rep("All", times = nrow(metadata))
 
   ###########################
   #--------Return-----------#

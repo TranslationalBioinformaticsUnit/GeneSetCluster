@@ -5,7 +5,7 @@
 \title{CombineGeneSets}
 \usage{
 CombineGeneSets(Object, combineMethod = "Standard",
-  combineMethod.supplied)
+  combineMethod.supplied, display = "Condensed")
 }
 \arguments{
 \item{Object}{A PathwayObject.}
@@ -13,6 +13,9 @@ CombineGeneSets(Object, combineMethod = "Standard",
 \item{combineMethod}{lets the functions know if the standard RR needs to be calculated or the user supplied function.}
 
 \item{combineMethod.supplied}{a function which parameter A and parameter B.}
+
+\item{display}{Either Condensed or Expanded. Expanded seperates the groups
+and adds a 1 to every group is this molecular signature is seen here}
 }
 \value{
 a pathwayobject

@@ -3,6 +3,7 @@
 #' Automatic loader for gene sets from the IPA and Great tools.
 #'
 #' @import readxl
+#' @import limma
 #' @importFrom utils read.csv write.table
 #' @param file_location A location string in a vector.
 #' @param groupnames A vector with group names of the different gene set experiments
@@ -42,7 +43,7 @@
 #'
 #'
 #' @export
-LoadGeneSets <- function(file_location,
+LoadGeneSets <- function(file_location = canonical.files,
                          groupnames= c("MClust_1", "MClust_26", "MClust_3457"),
                          P.cutoff = 1.3,
                          Mol.cutoff = 5,
@@ -51,7 +52,7 @@ LoadGeneSets <- function(file_location,
                          type = "Canonical_Pathways",
                          topranks = "",
                          structure = "SYMBOL",
-                         Organism = "org.Hs.eg.db",#Human genes for converting genes to the right structure
+                         Organism = "org.Mm.eg.db",#Human genes for converting genes to the right structure
                          seperator = ",")
 {
 
@@ -146,6 +147,7 @@ LoadGeneSets <- function(file_location,
       list.canonical.f[[i]] <- Data
     }
     names(list.canonical.f) <- names(list.canonical)
+
     ####################################
     ##---------Pheno data-------------##
     ####################################
@@ -161,8 +163,9 @@ LoadGeneSets <- function(file_location,
     ###################################
     ##---------Meta data-------------##
     ###################################
-    metadata <- matrix(NA, nrow = length(groupnames), ncol = 11)
-    colnames(metadata) <- c("source", "type", "structure", "organism", "Groups", "seperator", "Data", "cluster.method", "highlight", "order.group", "loaded")
+    metadata <- matrix(NA, nrow = length(groupnames), ncol = 13)
+    colnames(metadata) <- c("source", "type", "structure", "organism", "Groups", "seperator", "Data",
+                            "cluster.method", "highlight", "order.group", "loaded", "display", "mol.signature")
     rownames(metadata) <- paste("Experiment",1:length(groupnames), sep="_" )
     metadata <- as.data.frame(metadata)
 
@@ -174,6 +177,9 @@ LoadGeneSets <- function(file_location,
     metadata[,"loaded"] <- rep("Auto", times = nrow(Pdata))
     metadata[,"Data"] <- rep("List", times = nrow(Pdata))
     metadata[,"seperator"] <- rep(seperator, times = nrow(Pdata))
+    metadata[,"display"] <- rep("Condensed", times = nrow(metadata))
+    metadata[,"mol.signature"] <- rep("All", times = nrow(metadata))
+
   }
 
   ######################################
@@ -280,8 +286,9 @@ LoadGeneSets <- function(file_location,
     ###################################
     ##---------Meta data-------------##
     ###################################
-    metadata <- matrix(NA, nrow = length(list.canonical.f), ncol = 11)
-    colnames(metadata) <- c("source", "type", "structure", "organism", "Groups", "seperator", "Data", "cluster.method", "highlight", "order.group", "loaded")
+    metadata <- matrix(NA, nrow = length(list.canonical.f), ncol = 13)
+    colnames(metadata) <- c("source", "type", "structure", "organism", "Groups", "seperator", "Data",
+                            "cluster.method", "highlight", "order.group", "loaded", "display", "mol.signature")
     rownames(metadata) <- paste("Experiment",1:length(list.canonical.f), sep="_" )
     metadata <- as.data.frame(metadata)
 
@@ -293,7 +300,8 @@ LoadGeneSets <- function(file_location,
     metadata[,"loaded"] <- rep("Auto", times = nrow(Pdata))
     metadata[,"Data"] <- rep("List", times = nrow(Pdata))
     metadata[,"seperator"] <- rep(seperator, times = nrow(Pdata))
-
+    metadata[,"display"] <- rep("Condensed", times = nrow(Pdata))
+    metadata[,"mol.signature"] <- rep("All", times = nrow(Pdata))
 
 
   }

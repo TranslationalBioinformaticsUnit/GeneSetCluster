@@ -1,14 +1,14 @@
 
 #' ClusterGeneSets
 #'
-#' @import mclust
 #' @import stats
 #' @import methods
 #' @importFrom stats dist hclust kmeans
 #' @param Object A PathwayObject
 #' @param clusters A numeric with the number of clusters required
-#' @param method The cluster method specified
+#' @param method The cluster method specified, Options are kmeans, kmeans_group, Hierarchical and Hierarchical_group
 #' @param order How should the data be ordered, by group or by cluster
+#' @param molecular.signature to filter the molecular signatures which are duplicated before clustering. options are Unique or All
 #'
 #'
 #' @return PathwayObject
@@ -46,13 +46,13 @@
 #'
 #'
 
-ClusterGeneSets <- function(Object, clusters = 5, method = "kmeans", order = "group")
+ClusterGeneSets <- function(Object, clusters = 5, method = "kmeans", order = "group", molecular.signature = "All")
 {
   message("[=========================================================]")
   message("[<<<<            ClusterGeneSets START               >>>>>]")
   message("-----------------------------------------------------------")
 
-  if(!nrow(Object@Data.RR)>=1)
+  if(nrow(Object@Data.RR)==0)
   {
     message("Make sure youre object has been combines by CombineGeneSets")
     stop()
@@ -64,9 +64,6 @@ ClusterGeneSets <- function(Object, clusters = 5, method = "kmeans", order = "gr
   if(method %in% c("kmeans", "Kmeans")){method <- "kmeans"}
   if(method %in% c("kmeans_group","Kmeans_group","Kmeans_Group", "kmeans group","Kmeans group")){method <- "kmeans_group"}
   #
-  if(method %in% c("MClust", "Mclust", "mclust")){method <- "mclust"}
-  if(method %in% c("Mclust_group","MClust_group", "mclust group","MClust group", "mclust_group")){method <- "mclust_group"}
-  #
   if(method %in% c("HierArchical", "hierarchical", "Hierarchical")){method <- "Hierarchical"}
   if(method %in% c("Hierarchical_group","hierarchical_group", "Hierarchical group","hierarchical group", "hierarchical_group")){method <- "Hierarchical_group"}
 
@@ -77,9 +74,9 @@ ClusterGeneSets <- function(Object, clusters = 5, method = "kmeans", order = "gr
     clusters <- nrow(Object@Data[[1]])
   }
 
-  if(sum(method %in% c("kmeans", "kmeans_group", "mclust","mclust_group", "Hierarchical", "Hierarchical_group")) < 1)
+  if(sum(method %in% c("kmeans", "kmeans_group", "Hierarchical", "Hierarchical_group")) < 1)
   {
-    message("Method is not a proper method of clustering")
+    message("Method is not a supported method of clustering")
     stop()
   }
   if(length(method) > 1)
@@ -91,8 +88,28 @@ ClusterGeneSets <- function(Object, clusters = 5, method = "kmeans", order = "gr
   ####################################
   #------------Combine DF------------#
   ####################################
-
   canonical.df <-Object@Data[[1]]
+  if(molecular.signature == "All")
+  {
+    message("Using all Gene sets")
+    canonical.df <-Object@Data[[1]]
+  }
+  if(molecular.signature == "Unique")
+  {
+    message("Using Unique Gene sets")
+    if(Object@metadata[,"display"] == "Condensed")
+    {
+      warning("Display is set to Condensed, this will lead to a loss of information")
+      warning("Advised is to set display to Expanded before filtering the unique molecular.signature")
+    }
+    Object@Data.RR <- Object@Data.RR[!duplicated(canonical.df$Molecules),
+                                     !duplicated(canonical.df$Molecules)]
+
+    canonical.df <- canonical.df[!duplicated(canonical.df$Molecules),]
+    Object@metadata[,"mol.signature"] <- rep("Unique", times = nrow(metadata))
+
+  }
+
 
   ####################################################
   #------------Kmeans of clusters--------------------#
@@ -101,7 +118,11 @@ ClusterGeneSets <- function(Object, clusters = 5, method = "kmeans", order = "gr
   {
     message("Running kmeans")
 
-    if(length(clusters) > 1){message("Too many clusters supplied, Taking first cluster")}
+    if(length(clusters) > 1)
+    {
+      message("Too many clusters supplied, Taking first cluster")
+      clusters <- clusters[1]
+    }
     canonical.df$cluster <- kmeans(x = Object@Data.RR, centers = clusters)$cluster
 
   }
@@ -136,63 +157,6 @@ ClusterGeneSets <- function(Object, clusters = 5, method = "kmeans", order = "gr
 
   }
 
-  #############################################
-  #----------mclust of clusters---------------#
-  #############################################
-
-
-  if(method == "mclust")
-  {
-    message("Running mclust")
-    if(length(clusters) > 1)
-    {
-      message("Too many clusters supplied, Taking first cluster")
-    }else{
-      message(paste("maximum number of inputted clusters =", clusters))
-    }
-
-    mclust.Bic <- mclustBIC(Object@Data.RR,seq(from=2,to=clusters,by=1),
-                            modelNames=c("VII", "EEI", "EVI", "VEI", "VVI", "EII"))
-
-    mclust.BicNsummary <- summary(mclust.Bic, Object@Data.RR)
-    canonical.df$cluster <- mclust.BicNsummary$classification
-    print(paste("Optimal number of clusters =", max(mclust.BicNsummary$classification)))
-  }
-
-
-
-  ##############################################################
-  #------------MClust of clusters per group--------------------#
-  ##############################################################
-  if(method == "mclust_group")
-  {
-    message("Running mclust on every group seperatly")
-    if(!length(clusters) == nrow(Object@Pdata))
-    {
-      message("Wrong number of clusters supplied")
-      stop()
-    }
-    optimal.clus <- vector()
-    temp.cl2 <- vector()
-    for(i in 1:nrow(Object@Pdata))
-    {
-
-      idx.ls <- Object@Data[[1]][as.character(Object@Data[[1]]$Group) == as.character(Object@Pdata[i,"Groupnames"]),"RR_name"]
-
-      rr.temp <- Object@Data.RR[idx.ls,idx.ls]
-      temp.BIC <- mclustBIC(rr.temp,seq(from=2,to=clusters[i],by=1),
-                            modelNames=c("VII", "EEI", "EVI", "VEI", "VVI", "EII"))
-
-      temp.BIC.sum <- summary(temp.BIC, rr.temp)
-      temp.cl1 <- temp.BIC.sum$classification
-      optimal.clus[i] <- max(temp.cl1)
-      if(i >1){temp.cl1 <- temp.cl1 + max(temp.cl2)}
-      temp.cl2 <- c(temp.cl2, temp.cl1)
-    }
-    canonical.df$cluster <- temp.cl2
-    print(paste("Optimal number of clusters =",optimal.clus))
-
-  }
   #########################################################
   #------------Hierarchical clustering--------------------#
   #########################################################
@@ -293,18 +257,48 @@ ClusterGeneSets <- function(Object, clusters = 5, method = "kmeans", order = "gr
               brewer.pal(n = 8, name ="Set3"),
               brewer.pal(n = 8, name ="Set1"))
 
-
-  if(length(unique(as.character(Object@Data[[1]]$Type))) > 1)
+  if(Object@metadata$display[1] == "Expanded")
   {
-    aka2 <- matrix(data = NA, nrow = nrow((Object@Data.RR)), ncol = 3)
-    colnames(aka2) <- c("Group", "Cluster", "Type")
-    aka2[,"Type"] <- as.character(Object@Data[[1]]$Type)
-    pal.type <- pal.c[1:length(unique(aka2[,"Type"]))]
-    names(pal.type) <- unique(aka2[,"Type"])
+    #Display is expanded meaning groups get marked seperatly
+    if(length(unique(as.character(Object@Data[[1]]$Type))) > 1)
+    {
+      aka2 <- matrix(data = NA,
+                     nrow = nrow((Object@Data.RR)),
+                     ncol = 3 +nrow(Object@metadata))
+      colnames(aka2) <- c("Group", "Cluster", "Type", unique(Object@metadata$Groups))
+      aka2[,"Type"] <- as.character(Object@Data[[1]]$Type)
+      pal.type <- pal.c[1:length(unique(aka2[,"Type"]))]
+      names(pal.type) <- unique(aka2[,"Type"])
 
+      for(groups.i in 1:nrow(Object@metadata))
+      {
+        aka2[,Object@metadata$Groups[groups.i]] <- Object@Data[[1]][,Object@metadata$Groups[groups.i]]
+
+      }
+
+    }else{
+      aka2 <- matrix(data = NA, nrow = nrow((Object@Data.RR)), ncol = 2+ nrow(Object@metadata))
+      colnames(aka2) <- c("Group", "Cluster", unique(Object@metadata$Groups))
+
+      for(groups.i in 1:nrow(Object@metadata))
+      {
+        aka2[,Object@metadata$Groups[groups.i]] <- Object@Data[[1]][,Object@metadata$Groups[groups.i]]
+
+      }
+    }
   }else{
-    aka2 <- matrix(data = NA, nrow = nrow((Object@Data.RR)), ncol = 2)
-    colnames(aka2) <- c("Group", "Cluster")
+    if(length(unique(as.character(Object@Data[[1]]$Type))) > 1)
+    {
+      aka2 <- matrix(data = NA, nrow = nrow((Object@Data.RR)), ncol = 3)
+      colnames(aka2) <- c("Group", "Cluster", "Type")
+      aka2[,"Type"] <- as.character(Object@Data[[1]]$Type)
+      pal.type <- pal.c[1:length(unique(aka2[,"Type"]))]
+      names(pal.type) <- unique(aka2[,"Type"])
+
+    }else{
+      aka2 <- matrix(data = NA, nrow = nrow((Object@Data.RR)), ncol = 2)
+      colnames(aka2) <- c("Group", "Cluster")
+    }
   }
   rownames(aka2) <- Object@Data[[1]]$RR_name
 
@@ -322,17 +316,51 @@ ClusterGeneSets <- function(Object, clusters = 5, method = "kmeans", order = "gr
   pal <- pal.c[1:length(unique(aka2[,"Cluster"]))]
   names(pal) <- unique(aka2[,"Cluster"])
 
-  if(length(unique(as.character(Object@Data[[1]]$Type))) > 1)
+  if(Object@metadata$display[1] == "Expanded")
   {
-    aka3 = list(Group = groups.col,
-                Cluster= pal,
-                Type = pal.type)
-    names(aka3) <-  c("Group", "Cluster", "Type")
 
+    if(length(unique(as.character(Object@Data[[1]]$Type))) > 1)
+    {
+      aka3 = list(Group = groups.col,
+                  Cluster= pal,
+                  Type = pal.type)
+
+      for(groups.i in 1:nrow(Object@metadata))
+      {
+        vector.x <- c("black","red")
+        names(vector.x) <- c(0,1)
+        aka3[[Object@metadata$Groups[groups.i]]] <-   vector.x
+      }
+
+      names(aka3) <-  c("Group", "Cluster", "Type",  unique(Object@metadata$Groups))
+
+    }else{
+      aka3 = list(Group = groups.col,
+                  Cluster= pal)
+
+      for(groups.i in 1:nrow(Object@metadata))
+      {
+        vector.x <- c("black","red")
+        names(vector.x) <- c(0,1)
+        aka3[[Object@metadata$Groups[groups.i]]] <-   vector.x
+      }
+
+      names(aka3) <-  c("Group", "Cluster",  unique(Object@metadata$Groups))
+    }
   }else{
-    aka3 = list(Group = groups.col,
-                Cluster= pal)
-    names(aka3) <-  c("Group", "Cluster")
+
+    if(length(unique(as.character(Object@Data[[1]]$Type))) > 1)
+    {
+      aka3 = list(Group = groups.col,
+                  Cluster= pal,
+                  Type = pal.type)
+      names(aka3) <-  c("Group", "Cluster", "Type")
+
+    }else{
+      aka3 = list(Group = groups.col,
+                  Cluster= pal)
+      names(aka3) <-  c("Group", "Cluster")
+    }
   }
 
   ##################################

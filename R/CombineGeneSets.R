@@ -3,11 +3,14 @@
 #' Calculate distances between the different experiments.
 #'
 #' @import clusterProfiler
+#' @import limma
 #' @import org.Hs.eg.db
 #' @import org.Mm.eg.db
 #' @param Object A PathwayObject.
 #' @param combineMethod lets the functions know if the standard RR needs to be calculated or the user supplied function.
 #' @param combineMethod.supplied a function which parameter A and parameter B.
+#' @param display Either Condensed or Expanded. Expanded seperates the groups
+#'                and adds a 1 to every group is this molecular signature is seen here
 #'
 #' @return a pathwayobject
 #'
@@ -42,7 +45,7 @@
 #'
 
 
-CombineGeneSets <- function(Object, combineMethod="Standard", combineMethod.supplied)
+CombineGeneSets <- function(Object, combineMethod="Standard", combineMethod.supplied, display="Condensed")
 {
   message("[=========================================================]")
   message("[<<<<            CombineGeneSets START               >>>>>]")
@@ -52,8 +55,7 @@ CombineGeneSets <- function(Object, combineMethod="Standard", combineMethod.supp
   ##---------align data stucture ------------##
   #############################################
 
-  structure <- Object@metadata[,"structure"]
-  if(!length(unique(structure)) == 1)
+  if(length(unique(Object@metadata[,"structure"])) > 1)
   {
 
     message("Warning, data structure not the same, converting all to structure of experiment 1")
@@ -123,6 +125,35 @@ CombineGeneSets <- function(Object, combineMethod="Standard", combineMethod.supp
     pathways.i <- do.call(rbind, Object@Data)
 
   }
+  pathways.i$GeneSets <- paste("GeneSet",1:nrow(pathways.i),sep="")
+
+  ################################################
+  ##-----------Condense or expand---------------##
+  ################################################
+  #Condensed or Expanded
+  if( display=="Expanded")
+  {
+    message("preparing expanded display")
+    Object@metadata[,"display"] <- rep("Expanded", times = nrow(Object@metadata))
+
+    #If display is expanded then based on the unique molecular signature
+    #in which group this signature is in gets marked
+    #multiple roups can share the signature
+    Pathways.sharedsets <- pathways.i
+
+
+    for(groups.i in 1:length(Object@PData$Groupnames))
+    {
+      Pathways.sharedsets$Group <- 0
+      colnames(Pathways.sharedsets)[ncol(Pathways.sharedsets)] <- Object@PData$Groupnames[groups.i]
+      Pathways.sharedsets[Pathways.sharedsets$Molecules %in% pathways.i[pathways.i$Groups == Object@PData$Groupnames[groups.i], "Molecules"],Object@PData$Groupnames[groups.i]] <- 1
+    }
+    pathways.i <- Pathways.sharedsets
+  }else{
+    message("preparing condensed display")
+
+  }
+
 
   #####################################
   ##---------Calculate RR------------##
