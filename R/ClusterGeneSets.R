@@ -3,12 +3,17 @@
 #'
 #' @import stats
 #' @import methods
+#' @import limma
+#'
 #' @importFrom stats dist hclust kmeans
+#'
 #' @param Object A PathwayObject
 #' @param clusters A numeric with the number of clusters required
-#' @param method The cluster method specified, Options are kmeans, kmeans_group, Hierarchical and Hierarchical_group
+#' @param method The cluster method specified, Options are kmeans, kmeans_group,
+#' Hierarchical and Hierarchical_group
 #' @param order How should the data be ordered, by group or by cluster
-#' @param molecular.signature to filter the molecular signatures which are duplicated before clustering. options are Unique or All
+#' @param molecular.signature to filter the molecular signatures which are duplicated
+#' before clustering. options are Unique or All
 #'
 #'
 #' @return PathwayObject

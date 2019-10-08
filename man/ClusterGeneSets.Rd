@@ -12,11 +12,13 @@ ClusterGeneSets(Object, clusters = 5, method = "kmeans",
 
 \item{clusters}{A numeric with the number of clusters required}
 
-\item{method}{The cluster method specified, Options are kmeans, kmeans_group, Hierarchical and Hierarchical_group}
+\item{method}{The cluster method specified, Options are kmeans, kmeans_group,
+Hierarchical and Hierarchical_group}
 
 \item{order}{How should the data be ordered, by group or by cluster}
 
-\item{molecular.signature}{to filter the molecular signatures which are duplicated before clustering. options are Unique or All}
+\item{molecular.signature}{to filter the molecular signatures which are duplicated
+before clustering. options are Unique or All}
 }
 \value{
 PathwayObject

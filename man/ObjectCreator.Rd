@@ -16,13 +16,13 @@ ObjectCreator(Pathways, Molecules, Groups, Source, Type, structure, sep,
 
 \item{Source}{Tool used to generate gene sets..}
 
+\item{Type}{For IPA data if Canonical pathways or Functional Anotations were supplied.}
+
 \item{structure}{The structure of the genes. is it SYMBOLS, ENSEMBL, NCBI etc. Used for converting when there is mutiple structure in the object.}
 
-\item{type}{For IPA data if Canonical pathways or Functional Anotations were supplied.}
+\item{sep}{A seperator, A character used within in the string to seperate genes}
 
-\item{Organism}{the package name for the human or mouse data, used for converting the gene structure. name of the package, currently org.Hs.eg.db and org.Mm.eg.db supported.}
-
-\item{seperator}{A character used within in the string to seperate genes}
+\item{organism}{the package name for the human or mouse data, used for converting the gene structure. name of the package, currently org.Hs.eg.db and org.Mm.eg.db supported.}
 }
 \value{
 a pathwayobject
@@ -59,9 +59,9 @@ Test.object1 <- ObjectCreator(Pathways = Test.object[,1],
 Molecules = Test.object[,2],
 Groups = Test.object[,3],
 Source = "Random",#we randomly generated this data
-type = "Test",
+Type = "Test",
 structure = "SYMBOL",
-sep = ",")#neccesay to seperate the different genes for combinations.
+sep = ",")
 
 
 
