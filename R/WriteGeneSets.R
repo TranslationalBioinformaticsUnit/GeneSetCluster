@@ -38,9 +38,9 @@
 #' IPA.object3 <- ClusterGeneSets(Object = IPA.object2,
 #'                               clusters = 12,
 #'                               method = "kmeans")
-#' WriteGeneSets(Object= IPA.object3,
-#'              file_location = "~/Project9/test/",
-#'              name = "IPA_20181123", write = "Both")
+#' #WriteGeneSets(Object= IPA.object3,
+#'  #           file_location = "~/Project9/test/",
+#'  #            name = "IPA_20181123", write = "Both")
 #'
 #'
 setGeneric(name="WriteGeneSets",

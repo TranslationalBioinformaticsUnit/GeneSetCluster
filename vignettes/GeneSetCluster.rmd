@@ -1,7 +1,7 @@
 ---
 title: "GeneSetCluster"
 author: "Ewoud Ewing"
-date: "06/05/2019"
+date: "16/09/2019"
 output:
     BiocStyle::html_document:
         toc: true
@@ -21,6 +21,10 @@ require(pheatmap)
 require(readxl)
 require(org.Hs.eg.db)
 require(org.Mm.eg.db)
+require(clustree)
+require(factoextra)
+require(network)
+require(GGally)
 
 ```
 
@@ -141,11 +145,18 @@ Combine object gives you the option to display a condensed version of the data o
 
 Advised is to not filter for unique molecular signature when the display is set to Condensed. This will lead to a loss of information. Advised is to set display to Expanded before filtering for unique molecular signatures.
 
-```{r Great with Background combine and cluster }
+```{r Great with Background combine and cluster condensed}
 
 man.Great.Object2 <- CombineGeneSets(Object = man.Great.Object1, 
                                      combineMethod = "Standard",
                                      display = "condensed")
+
+OptimalGeneSets(object = man.Great.Object2, method = "silhouette", cluster_method = "kmeans", main="man.Great.Object1",max_cluster = 10)
+```
+
+
+
+```{r Great with Background combine and cluster Expanded}
 man.Great.Object3 <- ClusterGeneSets(Object = man.Great.Object2, 
                                  clusters = 5, 
                                  method = "kmeans", 
@@ -187,8 +198,22 @@ PlotGeneSets(Object =man.Great.Object3.expanded, fontsize = 3,
 
 
 ```
+###Plot The great RR network
+Using the PlotGeneNetworks function on the PathwayObject plots a network. Plotting the network shows the relationship of Gene set with other gene sets in context with the minimum number of distance between them.
 
-At the moment there is no plugin to deterermine the optimal number of clusters, therefor the user is advised to run several numbers of clusters to determine the optimal, e.g. a loop with different number of clusters plotted into a pdf.
+
+```{r plotPathway networks, echo=FALSE}
+PlotGeneNetworks(Object =man.Great.Object3,labels = F, RRmin = 0)
+PlotGeneNetworks(Object =man.Great.Object3,labels = F, RRmin = 5)
+PlotGeneNetworks(Object =man.Great.Object3,labels = F, RRmin = 10)
+PlotGeneNetworks(Object =man.Great.Object3.expanded,labels = F, RRmin = 0)
+PlotGeneNetworks(Object =man.Great.Object3.expanded,labels = F, RRmin = 5)
+PlotGeneNetworks(Object =man.Great.Object3.expanded,labels = F, RRmin = 10)
+PlotGeneNetworks(Object =man.Great.Object3.expanded,labels = T, RRmin = 10)
+
+
+
+```
 
 
 ##IPA
@@ -245,9 +270,10 @@ Here we combine and cluster the IPA output using kmeans.
 
 ```{r combine and cluseter IPA Pathways}
 
+
 IPA.object2 <- CombineGeneSets(Object = IPA.object1,
                                display = "Expanded")
-
+OptimalGeneSets(object = IPA.object2, method = "silhouette", cluster_method = "kmeans", main="IPA.object",max_cluster = 15)
 IPA.object3 <- ClusterGeneSets(Object = IPA.object2, 
                                clusters = 12, 
                                method = "kmeans")
@@ -268,7 +294,7 @@ IPA.object3.highlight <- HighlightGeneSets(Object = IPA.object3,
 ###Plot The IPA canonical RR with highlights clusters
 These highlighted genes add a bar with highlight to the plot
 
-```{r PlotPathways with highlight, echo=FALSE}
+```{r              with highlight, echo=FALSE}
 
 PlotGeneSets(Object =IPA.object3, fontsize = 3,
             legend = T,
@@ -281,6 +307,11 @@ PlotGeneSets(Object =IPA.object3.highlight, fontsize = 3,
             annotation.mol=F,
             RR.max = 60,
             main="IPA canonical with highlights clusters")
+
+
+
+PlotGeneNetworks(Object =IPA.object3,labels = F, RRmin = 0)
+PlotGeneNetworks(Object =IPA.object3,labels = F, RRmin = 5)
 ```
 
 THis highlight can also be seen using ShowGeneSets. Note the ShowGeneSets returns a data.frame, use of head(), tail() etc to not overwhelm the console with data.
@@ -380,7 +411,7 @@ This functional object works the same as the rest.
 
 IPA.Functional.object2 <- CombineGeneSets(Object = IPA.Functional.object1, 
                                           display = "Expanded")
-
+OptimalGeneSets(object = IPA.Functional.object2, method = "Gap", cluster_method = "kmeans", main="IPA.Functional.object2",max_cluster = 15)
 IPA.Functional.object3 <- ClusterGeneSets(Object = IPA.Functional.object2, 
                                clusters = 8, 
                                method = "kmeans")

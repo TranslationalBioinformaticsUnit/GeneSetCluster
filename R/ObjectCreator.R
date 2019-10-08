@@ -6,10 +6,10 @@
 #' @param Molecules A vector with strings of genes within each Gene-Set. Each string is seperated using the seperator supplied.
 #' @param Groups A vector with group names of the different gene set experiments
 #' @param Source Tool used to generate gene sets..
-#' @param type For IPA data if Canonical pathways or Functional Anotations were supplied.
+#' @param Type For IPA data if Canonical pathways or Functional Anotations were supplied.
 #' @param structure The structure of the genes. is it SYMBOLS, ENSEMBL, NCBI etc. Used for converting when there is mutiple structure in the object.
-#' @param Organism the package name for the human or mouse data, used for converting the gene structure. name of the package, currently org.Hs.eg.db and org.Mm.eg.db supported.
-#' @param seperator A character used within in the string to seperate genes
+#' @param organism the package name for the human or mouse data, used for converting the gene structure. name of the package, currently org.Hs.eg.db and org.Mm.eg.db supported.
+#' @param sep A seperator, A character used within in the string to seperate genes
 #'
 #' @return a pathwayobject
 #'
@@ -43,9 +43,9 @@
 #'Molecules = Test.object[,2],
 #'Groups = Test.object[,3],
 #'Source = "Random",#we randomly generated this data
-#'type = "Test",
+#'Type = "Test",
 #'structure = "SYMBOL",
-#'sep = ",")#neccesay to seperate the different genes for combinations.
+#'sep = ",")
 #'
 #'
 #'
