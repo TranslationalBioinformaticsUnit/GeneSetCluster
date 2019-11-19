@@ -165,7 +165,7 @@ CombineGeneSets <- function(Object, combineMethod="Standard", combineMethod.supp
     message(paste("calulating",combineMethod))
   }
   pathways.mtx <- matrix(data = 0, nrow = nrow(pathways.i), ncol = length(molecules))
-  colnames(pathways.mtx) <- molecules
+  colnames(pathways.mtx) <- toupper(molecules)
   rownames(pathways.mtx) <- as.character(pathways.i$Pathways)
   #
 
