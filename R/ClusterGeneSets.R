@@ -316,7 +316,11 @@ ClusterGeneSets <- function(Object, clusters = 5, method = "kmeans", order = "gr
     message("Warning: number of cluster is larger than colours supported")
   }
 
-  groups.col <- brewer.pal(n = 8, name ="Set2" )[1:length(unique(aka2[,"Group"]))]
+  groups.col <- c(brewer.pal(n = 8, name ="Accent" ),
+              brewer.pal(n = 8, name ="Dark2" ),
+              brewer.pal(n = 8, name ="Set3"),
+              brewer.pal(n = 8, name ="Set1"))[1:length(unique(aka2[,"Group"]))]
+                   
   names(groups.col) <- unique(aka2[,"Group"])
   pal <- pal.c[1:length(unique(aka2[,"Cluster"]))]
   names(pal) <- unique(aka2[,"Cluster"])
