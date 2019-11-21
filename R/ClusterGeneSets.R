@@ -102,7 +102,7 @@ ClusterGeneSets <- function(Object, clusters = 5, method = "kmeans", order = "gr
   if(molecular.signature == "Unique")
   {
     message("Using Unique Gene sets")
-    if(Object@metadata[,"display"] == "Condensed")
+    if(Object@metadata[1,"display"] == "Condensed")
     {
       warning("Display is set to Condensed, this will lead to a loss of information")
       warning("Advised is to set display to Expanded before filtering the unique molecular.signature")
@@ -270,24 +270,24 @@ ClusterGeneSets <- function(Object, clusters = 5, method = "kmeans", order = "gr
       aka2 <- matrix(data = NA,
                      nrow = nrow((Object@Data.RR)),
                      ncol = 3 +nrow(Object@metadata))
-      colnames(aka2) <- c("Group", "Cluster", "Type", unique(Object@metadata$Groups))
+      colnames(aka2) <- c("Group", "Cluster", "Type", unique(Object@PData$Groupnames))
       aka2[,"Type"] <- as.character(Object@Data[[1]]$Type)
       pal.type <- pal.c[1:length(unique(aka2[,"Type"]))]
       names(pal.type) <- unique(aka2[,"Type"])
 
       for(groups.i in 1:nrow(Object@metadata))
       {
-        aka2[,Object@metadata$Groups[groups.i]] <- Object@Data[[1]][,Object@metadata$Groups[groups.i]]
+        aka2[,Object@metadata$Groups[groups.i]] <- Object@Data[[1]][,Object@PData$Groupnames[groups.i]]
 
       }
 
     }else{
       aka2 <- matrix(data = NA, nrow = nrow((Object@Data.RR)), ncol = 2+ nrow(Object@metadata))
-      colnames(aka2) <- c("Group", "Cluster", unique(Object@metadata$Groups))
+      colnames(aka2) <- c("Group", "Cluster", unique(Object@PData$Groupnames))
 
       for(groups.i in 1:nrow(Object@metadata))
       {
-        aka2[,Object@metadata$Groups[groups.i]] <- Object@Data[[1]][,Object@metadata$Groups[groups.i]]
+        aka2[,Object@metadata$Groups[groups.i]] <- Object@Data[[1]][,Object@PData$Groupnames[groups.i]]
 
       }
     }
