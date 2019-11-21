@@ -341,7 +341,7 @@ ClusterGeneSets <- function(Object, clusters = 5, method = "kmeans", order = "gr
         aka3[[Object@metadata$Groups[groups.i]]] <-   vector.x
       }
 
-      names(aka3) <-  c("Group", "Cluster", "Type",  unique(Object@metadata$Groups))
+      names(aka3) <-  c("Group", "Cluster", "Type",  unique(Object@PData$Groupnames))
 
     }else{
       aka3 = list(Group = groups.col,
@@ -354,7 +354,7 @@ ClusterGeneSets <- function(Object, clusters = 5, method = "kmeans", order = "gr
         aka3[[Object@metadata$Groups[groups.i]]] <-   vector.x
       }
 
-      names(aka3) <-  c("Group", "Cluster",  unique(Object@metadata$Groups))
+      names(aka3) <-  c("Group", "Cluster",  unique(Object@PData$Groupnames))
     }
   }else{
 
