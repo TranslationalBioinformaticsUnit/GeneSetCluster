@@ -111,7 +111,7 @@ ClusterGeneSets <- function(Object, clusters = 5, method = "kmeans", order = "gr
                                      !duplicated(canonical.df$Molecules)]
 
     canonical.df <- canonical.df[!duplicated(canonical.df$Molecules),]
-    Object@metadata[,"mol.signature"] <- rep("Unique", times = nrow(metadata))
+    Object@metadata[,"mol.signature"] <- rep("Unique", times = nrow(Object@metadata))
 
   }
 
