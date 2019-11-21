@@ -1,7 +1,7 @@
 Package: GeneSetCluster
 Type: Package
 Title: Cluster together Gene-Sets from Gene Set Analysis
-Version: 1.2.0
+Version: 1.2.1
 Author: Ewoud Ewing
 Maintainer: Ewoud Ewing <ewoud.ewing@ki.se>
 Description: GeneSetCluster is a package for clustering Gene sets.
