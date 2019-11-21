@@ -277,7 +277,7 @@ ClusterGeneSets <- function(Object, clusters = 5, method = "kmeans", order = "gr
 
       for(groups.i in 1:nrow(Object@metadata))
       {
-        aka2[,Object@metadata$Groups[groups.i]] <- Object@Data[[1]][,Object@PData$Groupnames[groups.i]]
+        aka2[,Object@PData$Groupnames[groups.i]] <- Object@Data[[1]][,Object@PData$Groupnames[groups.i]]
 
       }
 
@@ -287,7 +287,7 @@ ClusterGeneSets <- function(Object, clusters = 5, method = "kmeans", order = "gr
 
       for(groups.i in 1:nrow(Object@metadata))
       {
-        aka2[,Object@metadata$Groups[groups.i]] <- Object@Data[[1]][,Object@PData$Groupnames[groups.i]]
+        aka2[,Object@PData$Groupnames[groups.i]] <- Object@Data[[1]][,Object@PData$Groupnames[groups.i]]
 
       }
     }
@@ -338,7 +338,7 @@ ClusterGeneSets <- function(Object, clusters = 5, method = "kmeans", order = "gr
       {
         vector.x <- c("black","red")
         names(vector.x) <- c(0,1)
-        aka3[[Object@metadata$Groups[groups.i]]] <-   vector.x
+        aka3[[Object@PData$Groupnames[groups.i]]] <-   vector.x
       }
 
       names(aka3) <-  c("Group", "Cluster", "Type",  unique(Object@PData$Groupnames))
@@ -351,7 +351,7 @@ ClusterGeneSets <- function(Object, clusters = 5, method = "kmeans", order = "gr
       {
         vector.x <- c("black","red")
         names(vector.x) <- c(0,1)
-        aka3[[Object@metadata$Groups[groups.i]]] <-   vector.x
+        aka3[[Object@PData$Groupnames[groups.i]]] <-   vector.x
       }
 
       names(aka3) <-  c("Group", "Cluster",  unique(Object@PData$Groupnames))
