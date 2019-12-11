@@ -97,7 +97,7 @@ CombineGeneSets <- function(Object, combineMethod="Standard", combineMethod.supp
     x <- unique(x)
     x <- x[!is.na(x)]
     x <- x[!x ==""]
-
+    x <- toupper(x)
     molecules <- unique(c(molecules, x))
   }
 
