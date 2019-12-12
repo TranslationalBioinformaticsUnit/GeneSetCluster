@@ -1,6 +1,6 @@
-#' CombineGeneSets
+#' OptimalGeneSets
 #'
-#' Calculate distances between the different experiments.
+#' Calculate an optimal number of clusters for a PathwayObject
 #' @import clustree
 #' @import cluster
 #' @import factoextra
