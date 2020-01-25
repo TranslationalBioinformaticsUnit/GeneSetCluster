@@ -11,6 +11,7 @@
 #' @param annotation.mol should the genes from the genes set be added to the plot.
 #' @param main is the plot title
 #' @param RR.max is the maximum distance size to be added, it cutsoff the max to this. Usefull if the distance score gets very high.
+#' @param cluster.order is the order you want the clusters to be plotted in.
 #'
 #' @return plot
 #'
@@ -21,7 +22,8 @@ setGeneric(name="PlotGeneSets",
                         legend = T,
                         annotation.mol=F,
                         main="",
-                        RR.max = "")
+                        RR.max = "",
+                        cluster.order="")
            {
              standardGeneric("PlotGeneSets")
            }
@@ -36,6 +38,7 @@ setGeneric(name="PlotGeneSets",
 #' @param annotation.mol should the genes from the genes set be added to the plot.
 #' @param main is the plot title
 #' @param RR.max is the maximum distance size to be added, it cutsoff the max to this. Usefull if the distance score gets very high.
+#' @param cluster.order is the order you want the clusters to be plotted in.
 #'
 #' @return plot
 #' @export
@@ -79,51 +82,72 @@ setMethod(f="PlotGeneSets",
                               legend = T,
                               annotation.mol=F,
                               main="",
-                              RR.max = "")
+                              RR.max = "",
+                              cluster.order = "")
           {
             Data.RR <- Object@Data.RR
-            if(!RR.max == "")
+          if(!RR.max == "")
+          {
+            RR.max <- as.numeric(as.character(RR.max))
+            for(rows.i in 1:nrow(Data.RR))
             {
-              RR.max <- as.numeric(as.character(RR.max))
-              for(rows.i in 1:nrow(Data.RR))
-              {
-                idx <- Data.RR[rows.i,] > RR.max
-                names(idx) <- NULL
-                Data.RR[rows.i,idx] <- RR.max
-              }
-            }
-
-            col.ramp <- colorRampPalette(c("white","grey","Tomato","red","red","red","red","red","red","red"))
-            if(annotation.mol==T)
-            {
-              pheatmap(mat = Data.RR, color = col.ramp(n = 75),
-                       main=main,
-                       fontsize_row = fontsize,
-                       fontsize_col = fontsize,
-                       labels_row = Object@Data[[1]]$Molecules,
-                       labels_col = rownames(Object@plot$aka2),
-                       cluster_cols = F,#Object@plot$col.dd,
-                       cluster_rows = F,#Object@plot$col.dd,
-                       cellwidth = fontsize,
-                       cellheight = fontsize,
-                       legend = legend,
-                       annotation_col = Object@plot$aka2,
-                       annotation_row = Object@plot$aka2,
-                       annotation_colors = Object@plot$aka3,
-                       annotation_legend = legend)
-            }else{
-              pheatmap(mat = Data.RR,
-                       color = col.ramp(n = 75),
-                       main=main,
-                       labels_row = rep("",times=nrow(Data.RR)),
-                       labels_col = rep("",times=ncol(Data.RR)),
-                       cluster_cols = F,#Object@plot$col.dd,
-                       cluster_rows = F,#Object@plot$col.dd,
-                       annotation_col = Object@plot$aka2,
-                       annotation_row = Object@plot$aka2, #border_color="blue",
-                       annotation_colors = Object@plot$aka3,
-                       annotation_legend = T)
+              idx <- Data.RR[rows.i,] > RR.max
+              names(idx) <- NULL
+              Data.RR[rows.i,idx] <- RR.max
             }
           }
+          if(!cluster.order== "")
+          {
+            if(!length(cluster.order) == max(as.numeric(as.character(Object@plot$aka2$Cluster))))
+            {
+              message("Make sure youre the order of supplied clusters is the same length as the number of clusters")
+              
+            }else{
+              order.x <- vector()
+              for(order.i in cluster.order)
+              {
+                order.x <- c(order.x, which(order.i == as.numeric(as.character(Object@plot$aka2$Cluster))))
+              }
+              Object@plot$aka2 <- Object@plot$aka2[order.x,]
+              
+              Data.RR <- Data.RR[order.x, order.x]
+            }
+            
+            
+          }
+          
+          col.ramp <- colorRampPalette(c("white","grey","Tomato","red","red","red","red","red","red","red"))
+          if(annotation.mol==T)
+          {
+            pheatmap(mat = Data.RR, color = col.ramp(n = 75),
+                     main=main,
+                     fontsize_row = fontsize,
+                     fontsize_col = fontsize,
+                     labels_row = Object@Data[[1]]$Molecules,
+                     labels_col = rownames(Object@plot$aka2),
+                     cluster_cols = F,#Object@plot$col.dd,
+                     cluster_rows = F,#Object@plot$col.dd,
+                     cellwidth = fontsize,
+                     cellheight = fontsize,
+                     legend = legend,
+                     annotation_col = Object@plot$aka2,
+                     annotation_row = Object@plot$aka2,
+                     annotation_colors = Object@plot$aka3,
+                     annotation_legend = legend)
+          }else{
+            pheatmap(mat = Data.RR,
+                     color = col.ramp(n = 75),
+                     main=main,
+                     labels_row = rep("",times=nrow(Data.RR)),
+                     labels_col = rep("",times=ncol(Data.RR)),
+                     cluster_cols = F,#Object@plot$col.dd,
+                     cluster_rows = F,#Object@plot$col.dd,
+                     annotation_col = Object@plot$aka2,
+                     annotation_row = Object@plot$aka2, #border_color="blue",
+                     annotation_colors = Object@plot$aka3,
+                     annotation_legend = T)
+          }
+          }
+
 )
 
