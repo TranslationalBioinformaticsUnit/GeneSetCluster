@@ -12,15 +12,11 @@
 #' @return plot
 #'
 #' @examples
-#' @export
-#'IPA.files <- c(system.file("extdata", "MM10.IPA.KO.uGvsMac.Canonical_pathways.xls",
-#'               package = "GeneSetCluster"),
-#'               system.file("extdata", "MM10.IPA.WT.uGvsMac.Canonical_pathways.xls",
-#'               package = "GeneSetCluster"),
-#'               system.file("extdata", "MM10.IPA.KO.uGvsMac.Functional_annotations.xls",
-#'               package = "GeneSetCluster"),
-#'               system.file("extdata", "MM10.IPA.WT.uGvsMac.Functional_annotations.xls",
-#'               package = "GeneSetCluster"))
+#'
+#'IPA.files <- c(system.file("extdata", "MM10.IPA.KO.uGvsMac.Canonical_pathways.xls",package = "GeneSetCluster"),
+#'               system.file("extdata", "MM10.IPA.WT.uGvsMac.Canonical_pathways.xls",package = "GeneSetCluster"),
+#'               system.file("extdata", "MM10.IPA.KO.uGvsMac.Functional_annotations.xls",package = "GeneSetCluster"),
+#'               system.file("extdata", "MM10.IPA.WT.uGvsMac.Functional_annotations.xls",package = "GeneSetCluster"))
 #'canonical.files <- IPA.files[grep("Canonical", IPA.files)]
 #'
 #'IPA.object1 <- LoadGeneSets(file_location = canonical.files, #where are  the files
@@ -61,13 +57,10 @@ setGeneric(name="PlotGeneNetworks",
 #' @export
 #'
 #' @examples
-#' @export
-#'IPA.files <- c(system.file("extdata", "MM10.IPA.KO.uGvsMac.Canonical_pathways.xls",
-#'               package = "GeneSetCluster"),
-#'               system.file("extdata", "MM10.IPA.WT.uGvsMac.Canonical_pathways.xls",
-#'               package = "GeneSetCluster"),
-#'               system.file("extdata", "MM10.IPA.KO.uGvsMac.Functional_annotations.xls",
-#'               package = "GeneSetCluster"),
+#'
+#'IPA.files <- c(system.file("extdata", "MM10.IPA.KO.uGvsMac.Canonical_pathways.xls", package = "GeneSetCluster"),
+#'               system.file("extdata", "MM10.IPA.WT.uGvsMac.Canonical_pathways.xls", package = "GeneSetCluster"),
+#'               system.file("extdata", "MM10.IPA.KO.uGvsMac.Functional_annotations.xls",package = "GeneSetCluster"),
 #'               system.file("extdata", "MM10.IPA.WT.uGvsMac.Functional_annotations.xls",
 #'               package = "GeneSetCluster"))
 #'canonical.files <- IPA.files[grep("Canonical", IPA.files)]

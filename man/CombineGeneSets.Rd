@@ -10,7 +10,7 @@ CombineGeneSets(Object, combineMethod = "Standard",
 \arguments{
 \item{Object}{A PathwayObject.}
 
-\item{combineMethod}{lets the functions know if the standard RR needs to be calculated or the user supplied function.}
+\item{combineMethod}{lets the functions know if the standard RR, a Jaccard index or Cohens Kappa.}
 
 \item{combineMethod.supplied}{a function which parameter A and parameter B.}
 

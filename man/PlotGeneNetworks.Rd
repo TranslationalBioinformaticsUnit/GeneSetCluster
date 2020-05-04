@@ -19,3 +19,27 @@ plot
 \description{
 Plots a heatmap with the distances per cluster
 }
+\examples{
+
+IPA.files <- c(system.file("extdata", "MM10.IPA.KO.uGvsMac.Canonical_pathways.xls",package = "GeneSetCluster"),
+              system.file("extdata", "MM10.IPA.WT.uGvsMac.Canonical_pathways.xls",package = "GeneSetCluster"),
+              system.file("extdata", "MM10.IPA.KO.uGvsMac.Functional_annotations.xls",package = "GeneSetCluster"),
+              system.file("extdata", "MM10.IPA.WT.uGvsMac.Functional_annotations.xls",package = "GeneSetCluster"))
+canonical.files <- IPA.files[grep("Canonical", IPA.files)]
+
+IPA.object1 <- LoadGeneSets(file_location = canonical.files, #where are  the files
+                           groupnames= c("KO", "WT"),
+                           P.cutoff = 1.3,
+                           Mol.cutoff = 5,
+                           Source = "IPA",
+                           type = "Canonical_Pathways",
+                           structure = "SYMBOL",
+                           seperator = ",")
+ IPA.object2 <- CombineGeneSets(Object = IPA.object1)
+ IPA.object3 <- ClusterGeneSets(Object = IPA.object2,
+                            clusters = 7,
+                            method = "kmeans")
+
+ PlotGeneNetworks(Object = IPA.object3, labels=F, RRmin = 0)
+
+}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/ORAGeneSets.R
 \name{ORAGeneSets}
 \alias{ORAGeneSets}
-\title{GetSTRINGdbPerGeneSets}
+\title{ORAGeneSets}
 \usage{
 ORAGeneSets(Object, ORA.returned = 10, unique.per.cluster = T)
 }
@@ -17,7 +17,7 @@ ORAGeneSets(Object, ORA.returned = 10, unique.per.cluster = T)
 a data frame with the over represented gene sets for all the clusters.
 }
 \description{
-GetSTRINGdbPerGeneSets
+ORAGeneSets
 }
 \examples{
 
@@ -39,6 +39,6 @@ IPA.object2 <- CombineGeneSets(Object = IPA.object1)
 IPA.object3 <- ClusterGeneSets(Object = IPA.object2,
                               clusters = 7,
                               method = "kmeans")
-ORAGeneSets(Object = IPA.object3,unique.per.cluster = T ,
+ORAGeneSets(Object = IPA.object3,unique.per.cluster = TRUE ,
                                              ORA.returned = 1)
 }

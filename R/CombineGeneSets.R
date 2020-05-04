@@ -7,7 +7,7 @@
 #' @import org.Hs.eg.db
 #' @import org.Mm.eg.db
 #' @param Object A PathwayObject.
-#' @param combineMethod lets the functions know if the standard RR needs to be calculated or the user supplied function.
+#' @param combineMethod lets the functions know if the standard RR, a Jaccard index or Cohens Kappa.
 #' @param combineMethod.supplied a function which parameter A and parameter B.
 #' @param display Either Condensed or Expanded. Expanded seperates the groups
 #'                and adds a 1 to every group is this molecular signature is seen here
@@ -97,7 +97,7 @@ CombineGeneSets <- function(Object, combineMethod="Standard", combineMethod.supp
     x <- unique(x)
     x <- x[!is.na(x)]
     x <- x[!x ==""]
-    x <- toupper(x)
+
     molecules <- unique(c(molecules, x))
   }
 
@@ -158,14 +158,14 @@ CombineGeneSets <- function(Object, combineMethod="Standard", combineMethod.supp
   #####################################
   ##---------Calculate RR------------##
   #####################################
-  if(combineMethod == "Standard")
+  if(combineMethod == "Standard" | combineMethod == "RR")
   {
     message("calulating RR")
   }else{
     message(paste("calulating",combineMethod))
   }
   pathways.mtx <- matrix(data = 0, nrow = nrow(pathways.i), ncol = length(molecules))
-  colnames(pathways.mtx) <- toupper(molecules)
+  colnames(pathways.mtx) <- molecules
   rownames(pathways.mtx) <- as.character(pathways.i$Pathways)
   #
 
@@ -186,7 +186,7 @@ CombineGeneSets <- function(Object, combineMethod="Standard", combineMethod.supp
   ############################################
   #---------User supplied function-----------#
   ############################################
-  if(!combineMethod=="Standard")
+  if(combineMethod=="User")
   {
     for(Disease1 in 1:nrow(RR))
     {
@@ -196,6 +196,60 @@ CombineGeneSets <- function(Object, combineMethod="Standard", combineMethod.supp
       }
     }
   }
+
+  #############################
+  #---------Jaccard-----------#
+  #############################
+  if(combineMethod=="Jaccard")
+  {
+
+    jaccard <- function(A,B)
+    {
+      M <- sum(as.vector(A) == 1 & as.vector(B) == 1)
+      A.c <- sum(as.vector(A) == 1 & as.vector(B) == 0)
+      B.c <- sum(as.vector(A) == 0 & as.vector(B) == 1)
+      J <- M/(A.c+B.c+M)
+      return(J)
+    }
+
+
+
+    for(Disease1 in 1:nrow(RR))
+    {
+      for(Disease2 in 1:ncol(RR))
+      {
+        RR[Disease1,Disease2] <- jaccard(A = pathways.mtx[Disease1,], B = pathways.mtx[Disease2,])
+      }
+    }
+  }
+
+  #############################
+  #---------Cohen-----------#
+  #############################
+  if(combineMethod=="Cohen")
+  {
+
+    Cohen <- function(A,B)
+    {
+      P0 <- ((sum(as.vector(A) == 1 & as.vector(B) == 1)) +
+               (sum(as.vector(A) == 0 & as.vector(B) == 0)))/length(A)
+      Pe <- ((sum(as.vector(A) == 1) / length(A)) * (sum(as.vector(B) == 1) / length(B))) +
+            ((sum(as.vector(A) == 0) / length(A)) * (sum(as.vector(B) == 0) / length(B)))
+      K <- ((P0 - Pe)/(1 - Pe))
+      return(K)
+    }
+
+
+
+    for(Disease1 in 1:nrow(RR))
+    {
+      for(Disease2 in 1:ncol(RR))
+      {
+        RR[Disease1,Disease2] <- Cohen(A = pathways.mtx[Disease1,], B = pathways.mtx[Disease2,])
+      }
+    }
+  }
+
   #######################################
   #---------standard function-----------#
   #######################################

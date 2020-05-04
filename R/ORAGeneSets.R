@@ -1,6 +1,6 @@
-#' GetSTRINGdbPerGeneSets
+#' ORAGeneSets
 #'
-#' @import STRINGdb
+#' @import WebGestaltR
 #'
 #' @importFrom stats dist hclust kmeans
 #' @param Object A PathwayObject.
@@ -31,7 +31,7 @@
 #'IPA.object3 <- ClusterGeneSets(Object = IPA.object2,
 #'                               clusters = 7,
 #'                               method = "kmeans")
-#'ORAGeneSets(Object = IPA.object3,unique.per.cluster = T ,
+#'ORAGeneSets(Object = IPA.object3,unique.per.cluster = TRUE ,
 #'                                              ORA.returned = 1)
 
 
@@ -89,6 +89,10 @@ ORAGeneSets <- function(Object, ORA.returned = 10, unique.per.cluster=T)
 
     clus.org <- Object@metadata[1,"organism"]
     if(clus.org == "org.Hs.eg.db"){clus.org <- "hsapiens"}
+    if(clus.org == "org.Mm.eg.db"){clus.org <- "mmusculus"}
+
+    symbol.type <- Object@metadata[1,"structure"]
+    if(symbol.type == "SYMBOL"){symbol.type <- "genesymbol"}
 
     if(unique.per.cluster==F)
     {
@@ -105,13 +109,21 @@ ORAGeneSets <- function(Object, ORA.returned = 10, unique.per.cluster=T)
       next()
     }
 
+    genes.x <- limma::strsplit2(genes.x, split = " ")[,1]
+    genes.x <- limma::strsplit2(genes.x, split = "/")[,1]
+
+    genes.x <- genes.x[!genes.x == ""]
+
     ORA.clus.i.mol <- WebGestaltR(enrichMethod = "ORA",
                                   organism = clus.org,
                                   enrichDatabase = "geneontology_Biological_Process",
                                   interestGene =genes.x,
-                                  interestGeneType  = "genesymbol",
-                                  referenceGeneType = "genesymbol", referenceSet = "genome",sigMethod = ORA.method,
-                                  topThr = ORA.returned, isOutput = F)
+                                  interestGeneType  = symbol.type,
+                                  referenceGeneType = symbol.type,
+                                  referenceSet = "genome",
+                                  sigMethod = ORA.method,
+                                  topThr = ORA.returned,
+                                  isOutput = F)
     Object.list[[clus.i]] <- ORA.clus.i.mol
     names(Object.list)[clus.i] <- paste("Cluster_",clus.i,sep="")
 

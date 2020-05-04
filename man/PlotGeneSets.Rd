@@ -5,7 +5,7 @@
 \title{PlotGeneSets}
 \usage{
 PlotGeneSets(Object, fontsize = 5, legend = T, annotation.mol = F,
-  main = "", RR.max = "")
+  main = "", RR.max = "", cluster.order = "")
 }
 \arguments{
 \item{Object}{a pathway object}
@@ -19,6 +19,8 @@ PlotGeneSets(Object, fontsize = 5, legend = T, annotation.mol = F,
 \item{main}{is the plot title}
 
 \item{RR.max}{is the maximum distance size to be added, it cutsoff the max to this. Usefull if the distance score gets very high.}
+
+\item{cluster.order}{is a user defined order of the clusters in the heatmap.}
 }
 \value{
 plot

@@ -32,7 +32,7 @@
 #'                               clusters = 7,
 #'                               method = "kmeans")
 #'StringObject_unique <- GetSTRINGdbPerGeneSets(Object = IPA.object3,
-#'                                              unique.per.cluster = T ,
+#'                                              unique.per.cluster = TRUE ,
 #'                                              plot.input = "All")
 
 GetSTRINGdbPerGeneSets <- function(Object, unique.per.cluster=T, plot.input="All")

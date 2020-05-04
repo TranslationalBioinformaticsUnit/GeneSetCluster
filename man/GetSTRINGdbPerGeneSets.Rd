@@ -41,6 +41,6 @@ IPA.object3 <- ClusterGeneSets(Object = IPA.object2,
                               clusters = 7,
                               method = "kmeans")
 StringObject_unique <- GetSTRINGdbPerGeneSets(Object = IPA.object3,
-                                             unique.per.cluster = T ,
+                                             unique.per.cluster = TRUE ,
                                              plot.input = "All")
 }

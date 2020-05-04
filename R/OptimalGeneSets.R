@@ -1,6 +1,6 @@
-#' OptimalGeneSets
+#' CombineGeneSets
 #'
-#' Calculate an optimal number of clusters for a PathwayObject
+#' Calculate distances between the different experiments.
 #' @import clustree
 #' @import cluster
 #' @import factoextra
@@ -15,7 +15,6 @@
 #' @return a plot
 #'
 #' @examples
-#' @export
 #'
 #'require(GeneSetCluster)
 #'IPA.files <- c(system.file("extdata", "MM10.IPA.KO.uGvsMac.Canonical_pathways.xls",
