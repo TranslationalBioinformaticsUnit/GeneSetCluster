@@ -5,7 +5,7 @@
 \title{ClusterGeneSets}
 \usage{
 ClusterGeneSets(Object, clusters = 5, method = "kmeans",
-  order = "group", molecular.signature = "All")
+  order = "group", molecular.signature = "All", user_function)
 }
 \arguments{
 \item{Object}{A PathwayObject}
@@ -19,6 +19,8 @@ Hierarchical and Hierarchical_group}
 
 \item{molecular.signature}{to filter the molecular signatures which are duplicated
 before clustering. options are Unique or All}
+
+\item{user_function}{A user supplied function for clustering}
 }
 \value{
 PathwayObject

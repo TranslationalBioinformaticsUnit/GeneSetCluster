@@ -14,6 +14,7 @@
 #' @param order How should the data be ordered, by group or by cluster
 #' @param molecular.signature to filter the molecular signatures which are duplicated
 #' before clustering. options are Unique or All
+#' @param user_function A user supplied function for clustering
 #'
 #'
 #' @return PathwayObject
@@ -51,7 +52,7 @@
 #'
 #'
 
-ClusterGeneSets <- function(Object, clusters = 5, method = "kmeans", order = "group", molecular.signature = "All")
+ClusterGeneSets <- function(Object, clusters = 5, method = "kmeans", order = "group", molecular.signature = "All", user_function)
 {
   message("[=========================================================]")
   message("[<<<<            ClusterGeneSets START               >>>>>]")
@@ -211,6 +212,19 @@ ClusterGeneSets <- function(Object, clusters = 5, method = "kmeans", order = "gr
     canonical.df$cluster <- temp.cl2
 
   }
+
+  #########################################################
+  #------------User defined clustering--------------------#
+  #########################################################
+  if(method == "User_supplied")
+  {
+    message("Running User defined clustering function")
+
+    canonical.df$cluster <- user_function(Object@Data.RR)
+
+  }
+
+
   ############################################
   #---------Adding cluster info--------------#
   ############################################
@@ -233,6 +247,10 @@ ClusterGeneSets <- function(Object, clusters = 5, method = "kmeans", order = "gr
 
 
   }
+
+
+
+
   ###############################
   #--------Order clusters-------#
   ###############################
