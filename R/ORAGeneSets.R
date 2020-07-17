@@ -86,16 +86,16 @@ ORAGeneSets <- function(Object, ORA.returned = 10, unique.per.cluster=T)
   Object.list <- list()
   for(clus.i in 1:max(Object@Data[[1]]$cluster))
   {
+    
+    symbol.type <- Object@metadata[1,"structure"]
+    if(symbol.type == "SYMBOL"){symbol.type <- "genesymbol"}
 
     clus.org <- Object@metadata[1,"organism"]
     if(clus.org == "org.Hs.eg.db"){clus.org <- "hsapiens"}
     if(clus.org == "org.Mm.eg.db"){
       clus.org <- "mmusculus"
-      symbol.type <- "genesymbol"
     }
 
-    symbol.type <- Object@metadata[1,"structure"]
-    if(symbol.type == "SYMBOL"){symbol.type <- "genesymbol"}
 
     if(unique.per.cluster==F)
     {
@@ -105,9 +105,9 @@ ORAGeneSets <- function(Object, ORA.returned = 10, unique.per.cluster=T)
     {
       genes.x <- clus.mol.ls.unique[[clus.i]]
     }
-    if(length(genes.x) == 0)
+    if(length(genes.x) < 3)
     {
-      message(paste("Cluster ",clus.i, "has no unique genes",sep=""))
+      message(paste("Cluster ",clus.i, "has not enough genes",sep=""))
       message("Moving to next cluster")
       next()
     }
