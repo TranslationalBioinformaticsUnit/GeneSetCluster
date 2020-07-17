@@ -89,7 +89,10 @@ ORAGeneSets <- function(Object, ORA.returned = 10, unique.per.cluster=T)
 
     clus.org <- Object@metadata[1,"organism"]
     if(clus.org == "org.Hs.eg.db"){clus.org <- "hsapiens"}
-    if(clus.org == "org.Mm.eg.db"){clus.org <- "mmusculus"}
+    if(clus.org == "org.Mm.eg.db"){
+      clus.org <- "mmusculus"
+      symbol.type <- "genesymbol"
+    }
 
     symbol.type <- Object@metadata[1,"structure"]
     if(symbol.type == "SYMBOL"){symbol.type <- "genesymbol"}
