@@ -6,6 +6,7 @@
 #' @param Object A PathwayObject.
 #' @param ORA.returned A numeric for how Go terms should be returned per analysis. Alternative use "All" to get all of them.
 #' @param unique.per.cluster A vector with strings of genes within each Gene-Set. Each string is seperated using the seperator supplied.
+#' @param check.error If check.error =T then the program will check to make sure the webgestaltR function will run or skip at the cost of preformance
 #'
 #'
 #' @return a data frame with the over represented gene sets for all the clusters.
@@ -35,7 +36,7 @@
 #'                                              ORA.returned = 1)
 
 
-ORAGeneSets <- function(Object, ORA.returned = 10, unique.per.cluster=T)
+ORAGeneSets <- function(Object, ORA.returned = 10, unique.per.cluster=T, check.error=F)
 {
   message("[=========================================================]")
   message("[<<<<               ORAGeneSets START                >>>>>]")
@@ -117,6 +118,47 @@ ORAGeneSets <- function(Object, ORA.returned = 10, unique.per.cluster=T)
 
     genes.x <- genes.x[!genes.x == ""]
 
+    if(check.error == T)
+      {
+      is.error
+function (expr, tell = FALSE, force = FALSE) 
+{
+    expr_name <- deparse(substitute(expr))
+    test <- try(expr, silent = TRUE)
+    iserror <- inherits(test, "try-error")
+    if (tell) 
+        if (iserror) 
+            message("Note in is.error: ", test)
+    if (force) 
+        if (!iserror) 
+            stop(expr_name, " is not returning an error.", call. = FALSE)
+    iserror
+}
+       if(is.error(WebGestaltR(enrichMethod = "ORA",
+                          organism = clus.org,
+                          enrichDatabase = "geneontology_Biological_Process",
+                          interestGene =genes.x,
+                          interestGeneType  = symbol.type,
+                          referenceGeneType = symbol.type,
+                          referenceSet = "genome",
+                          sigMethod = ORA.method,
+                          topThr = ORA.returned,
+                          isOutput = F)) == T)
+    {
+    next()
+    }else{
+      ORA.clus.i.mol <-  WebGestaltR(enrichMethod = "ORA",
+                                        organism = clus.org,
+                                        enrichDatabase = "geneontology_Biological_Process",
+                                        interestGene =genes.x,
+                                        interestGeneType  = symbol.type,
+                                        referenceGeneType = symbol.type,
+                                        referenceSet = "genome",
+                                        sigMethod = ORA.method,
+                                        topThr = ORA.returned,
+                                        isOutput = F)
+                          }
+      }else{
     ORA.clus.i.mol <- WebGestaltR(enrichMethod = "ORA",
                                   organism = clus.org,
                                   enrichDatabase = "geneontology_Biological_Process",
@@ -127,6 +169,7 @@ ORAGeneSets <- function(Object, ORA.returned = 10, unique.per.cluster=T)
                                   sigMethod = ORA.method,
                                   topThr = ORA.returned,
                                   isOutput = F)
+      }
     Object.list[[clus.i]] <- ORA.clus.i.mol
     names(Object.list)[clus.i] <- paste("Cluster_",clus.i,sep="")
 
