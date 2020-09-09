@@ -11,7 +11,7 @@
 #' @param Mol.cutoff numeric value for minimum number of molecules.
 #' @param Source Tool used to generate gene sets.
 #' @param Great.Background If the Great tool was used, did the user supply a background.
-#' @param type For IPA data if Canonical pathways or Functional Anotations were supplied.
+#' @param type For IPA data if "Canonical_Pathways" or "Functional_annotations" were supplied.
 #' @param topranks numeric with the number of ranks per group to be loaded, usefull when there is a lot of data.
 #' @param structure The structure of the genes. is it SYMBOLS, ENSEMBL, NCBI etc. Used for converting when there is mutiple structure in the object.
 #' @param Organism the package name for the human or mouse data, used for converting the gene structure. name of the package, currently org.Hs.eg.db and org.Mm.eg.db supported.
