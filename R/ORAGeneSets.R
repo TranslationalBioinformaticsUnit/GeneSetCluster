@@ -120,8 +120,7 @@ ORAGeneSets <- function(Object, ORA.returned = 10, unique.per.cluster=T, check.e
 
     if(check.error == T)
       {
-      is.error
-function (expr, tell = FALSE, force = FALSE) 
+      is.error <- function (expr, tell = FALSE, force = FALSE) 
 {
     expr_name <- deparse(substitute(expr))
     test <- try(expr, silent = TRUE)
