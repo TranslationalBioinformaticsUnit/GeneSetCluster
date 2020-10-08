@@ -11,3 +11,7 @@ The data in the user guide is taken from https://www.ncbi.nlm.nih.gov/geo/query/
 For how to use the package see https://github.com/TranslationalBioinformaticsUnit/GeneSetCluster/wiki
 
 ![Pipeline](https://github.com/TranslationalBioinformaticsUnit/GeneSetCluster/blob/master/fig/GeneSetCluster_Outline_revision.png)
+
+Cite this article
+
+Ewing, E., Planell-Picola, N., Jagodic, M. et al. GeneSetCluster: a tool for summarizing and integrating gene-set analysis results. BMC Bioinformatics 21, 443 (2020). https://doi.org/10.1186/s12859-020-03784-z
