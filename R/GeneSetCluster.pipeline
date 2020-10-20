@@ -1,0 +1,43 @@
+
+#' GeneSetCluster.pipeline
+#'
+#' @param Object A PathwayObject
+#' @param max_cluster A numeric with the number of maximal possible clusters
+#' @param method The statistical method for determining the optimal number
+#' @param cluster_method How should the data be ordered, by group or by cluster
+#' @param name The name given to the plots and files
+#' @param write.pdf to automatically plot the files in a pdf
+#'
+#'
+#' @return Object The combined and clustered pathway object
+#'
+#' @examples
+#' GeneSetCluster.pipeline(Object, max_cluster=10, cluster_method = "kmeans", name = "GSC_test_object", write.pdf =T)
+#' @export
+#'
+#'
+GeneSetCluster.pipeline <- function(Object, max_cluster=10, cluster_method = "kmeans", name = "GSC", write.pdf =T)
+{
+  
+  Object <- CombineGeneSets(Object)
+  k <- GetOptimalCluster(Object, cluster_method = "kmeans",max_cluster = max_cluster, method ="gap")
+  Object <- ClusterGeneSets(Object = Object, clusters = k,method = "kmeans", order = "cluster" )
+  
+  if(write.pdf == T)
+  {
+    pdf(paste(getwd(),"/", name, ".pdf", sep=""), useDingbats = F, width = 10, height = 10)
+    
+    if(round(quantile(x, 0.4), digits = 0) < 1)
+    {
+      RRmin.x <- 1
+    }else{
+        RRmin.x <- round(quantile(x, 0.4), digits = 0)
+        }
+    
+    PlotGeneNetworks(Object, labels = F, RRmin = RRmin.x)
+    PlotGeneSets(Object = Object, annotation.mol = F, main = paste(name, " with ", k, "Clusters",sep=""), 
+                 RR.max = quantile(x, 0.9999))
+    dev.off()
+  }
+  
+}
