@@ -20,8 +20,8 @@ GeneSetCluster.pipeline <- function(Object, max_cluster=10, cluster_method = "km
 {
   
   Object <- CombineGeneSets(Object)
-  k <- GetOptimalCluster(Object, cluster_method = "kmeans",max_cluster = max_cluster, method ="gap")
-  Object <- ClusterGeneSets(Object = Object, clusters = k,method = "kmeans", order = "cluster" )
+  k <- GetOptimalCluster(Object, cluster_method = cluster_method,max_cluster = max_cluster, method ="gap")
+  Object <- ClusterGeneSets(Object = Object, clusters = k,method = cluster_method, order = "cluster" )
   
   if(write.pdf == T)
   {
@@ -35,9 +35,11 @@ GeneSetCluster.pipeline <- function(Object, max_cluster=10, cluster_method = "km
         }
     
     PlotGeneNetworks(Object, labels = F, RRmin = RRmin.x)
+    
     PlotGeneSets(Object = Object, annotation.mol = F, main = paste(name, " with ", k, "Clusters",sep=""), 
                  RR.max = quantile(x, 0.9999))
     dev.off()
   }
+  return(Object)
   
 }
