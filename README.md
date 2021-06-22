@@ -15,7 +15,7 @@ install.packages("devtools")
 
 require(devtools)
 
-install.github("TranslationalBioinformaticsUnit/GeneSetCluster")
+install_github("TranslationalBioinformaticsUnit/GeneSetCluster")
 
 
 # User guide
