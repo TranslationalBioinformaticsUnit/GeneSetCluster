@@ -8,10 +8,21 @@ To overcome such limitations, we present GeneSetCluster which allows integrating
 
 The data in the user guide is taken from https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE111385 Data has been analysed with Deseq2 pipeline where the data is Transcriptome sequencing of WT and conditional-Tgfbr2 knockout microglia and CNS-repopulating monocyte-derived macrophages from C57BL/6 mouse in triplicates. The genes were picked in a comparison of uG vs Mac in both WT and KO with a 1E-06 pvalue cutoff. Genes were analysed in both IPA with the Canonical pathways and functional annotations were exported into a excel file with default settings. Bed files were also generated for the genes, and uploaded in GREAT with a background of the sequencing samples. All data was exported in tsv format.
 
+# Installation
+
+
+install.packages("devtools")
+
+require(devtools)
+
+install.github("TranslationalBioinformaticsUnit/GeneSetCluster")
+
+
+# User guide
 For how to use the package see https://github.com/TranslationalBioinformaticsUnit/GeneSetCluster/wiki
 
 ![Pipeline](https://github.com/TranslationalBioinformaticsUnit/GeneSetCluster/blob/master/fig/GeneSetCluster_Outline_revision.png)
 
-Cite this article
+# Cite this article
 
 Ewing, E., Planell-Picola, N., Jagodic, M. et al. GeneSetCluster: a tool for summarizing and integrating gene-set analysis results. BMC Bioinformatics 21, 443 (2020). https://doi.org/10.1186/s12859-020-03784-z
