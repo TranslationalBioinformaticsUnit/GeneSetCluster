@@ -1,0 +1,30 @@
+GenesPerGeneset.Count.fc <- function(Object)
+{
+  require(limma)
+  clus.mol.ls <- list()
+  for(clus.i in 1:max(Object@Data[[1]]$cluster))
+  {
+    clus.x <- Object@Data[[1]][Object@Data[[1]]$cluster == clus.i,]
+    clus.x$Molecules <- as.character(clus.x$Molecules)
+    clus.mol.ls[[clus.i]] <- as.vector(strsplit2(clus.x$Molecules, split = Object@metadata$seperator[1]))
+  }
+  unique.mol <- unique(do.call(what = c, args = clus.mol.ls))
+  
+  mol.unique.df <- as.data.frame(matrix(0, nrow = length(unique.mol), ncol = length(clus.mol.ls)))
+  rownames(mol.unique.df) <- unique.mol
+  colnames(mol.unique.df) <-  paste("Cluster_", 1:length(clus.mol.ls), sep="")
+  clus.mol.vc <- do.call(what = c, args = clus.mol.ls)
+  
+  
+  
+  for(clus.i in 1:max(Object@Data[[1]]$cluster))
+  {
+    for(mol.i in 1:length(unique(clus.mol.ls[[clus.i]])))
+    {
+      mol.unique.df[unique(clus.mol.ls[[clus.i]])[mol.i],clus.i] <- sum(clus.mol.ls[[clus.i]] %in% unique(clus.mol.ls[[clus.i]])[mol.i])
+    }
+  }
+  
+
+  return(mol.unique.df)          
+  }
