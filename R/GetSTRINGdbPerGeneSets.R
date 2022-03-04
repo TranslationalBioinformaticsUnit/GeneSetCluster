@@ -7,6 +7,7 @@
 #' @param unique.per.cluster A vector with strings of genes within each Gene-Set. Each string is seperated using the seperator supplied.
 #' @param plot.input A vector with group names of the different gene set experiments
 #' @param threshold A numeric for the threshold of the string analysis
+#' @param version Version of StringDB to run (currently 11.5)
 #'
 #' @return a list with the string output and the prep for the plotting function PlotSTRINGdbPerGeneSets
 #'
@@ -33,9 +34,9 @@
 #'                               method = "kmeans")
 #'StringObject_unique <- GetSTRINGdbPerGeneSets(Object = IPA.object3,
 #'                                              unique.per.cluster = TRUE ,
-#'                                              plot.input = "All", threshold =100)
+#'                                              plot.input = "All", threshold =100, version = "11.5")
 
-GetSTRINGdbPerGeneSets <- function(Object, unique.per.cluster=T, plot.input="All", threshold = 100)
+GetSTRINGdbPerGeneSets <- function(Object, unique.per.cluster=T, plot.input="All", threshold = 100, version = "11.5")
 {
 
   message("[==================================================================]")
@@ -66,7 +67,7 @@ GetSTRINGdbPerGeneSets <- function(Object, unique.per.cluster=T, plot.input="All
   if (Object@metadata$organism[1] == "org.Mm.eg.db") {
     species = 10090
   }
-  string_db <- STRINGdb$new(version = "11", species = species, 
+  string_db <- STRINGdb$new(version = version, species = species, 
                             score_threshold = threshold, input_directory = "")
   df.plot <- list()
   for (df.i in 1:ncol(df)) {
