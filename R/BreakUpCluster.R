@@ -62,6 +62,11 @@ BreakUpCluster <- function(Object = Object, breakup.cluster = 6, sub.cluster=3)
   }  
   canonical.df <- Object@Data[[1]]
   
+  
+    order <- IPA.Object1@metadata$order.group[1]
+  method <- IPA.Object1@metadata$cluster.method[1]
+  
+  
   #############################################
   ###----Kmeans Cluster--------------------###
   #############################################
