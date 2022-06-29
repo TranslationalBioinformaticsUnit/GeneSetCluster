@@ -1,0 +1,54 @@
+#' RR_stats 
+#'
+#' @import stats
+#' @import methods
+#' @import limma
+#' @import utils
+#'
+#' @param Object A PathwayObject
+#' @export
+#'
+
+RR_stats <- function(Object)
+{
+  
+  message("[===================================================]")
+  message("[<<<<            RR_stats START                >>>>>]")
+  message("----------------------------------------------------")
+
+  Data.RR <- Object@Data.RR
+  Data.PD <- Object@Data[[1]]
+  rownames(Data.PD) <- Data.PD$RR_name
+  Data.PD <- Data.PD[,c(1,6,10:13)]
+  
+  temp.df <- as.data.frame(matrix(0, nrow = length(unique(Data.PD$cluster))+1, ncol = 2))
+  colnames(temp.df) <- c("Mean", "SD")
+  rownames(temp.df) <- paste0("Cluster",1:nrow(temp.df))
+  rownames(temp.df)[nrow(temp.df)] <- paste0("Overall")
+  for(i in 1:length(unique(Data.PD$cluster)))
+  {
+    temp.df[i,1] <- mean(as.matrix((Data.RR[rownames(Data.PD[Data.PD$cluster == i,]), rownames(Data.PD[Data.PD$cluster == i,])])))
+    temp.df[i,2] <- sd(as.matrix((Data.RR[rownames(Data.PD[Data.PD$cluster == i,]), rownames(Data.PD[Data.PD$cluster == i,])])))
+  }
+  
+  temp.df[nrow(temp.df),1] <- mean(as.matrix(Data.RR))
+  temp.df[nrow(temp.df),2] <- sd(as.matrix(Data.RR))
+  
+  Idx <- combn(x = seq_len(6), m = 2,simplify = TRUE)
+  
+  temp.df2 <- as.data.frame(matrix(0, nrow = ncol(Idx), ncol = 2))
+  colnames(temp.df2) <- c("Mean", "SD")
+  rownames(temp.df2) <- paste("Cluster",Idx[1,],"vsCluster", Idx[2,], sep="")
+  for(i in 1:nrow(temp.df2))
+  {
+    temp.df2[i,1] <- mean(as.matrix((Data.RR[rownames(Data.PD[Data.PD$cluster %in% Idx[,i],]), rownames(Data.PD[Data.PD$cluster %in% Idx[,i],])])))
+    temp.df2[i,2] <- sd(as.matrix((Data.RR[rownames(Data.PD[Data.PD$cluster %in% Idx[,i],]), rownames(Data.PD[Data.PD$cluster %in% Idx[,i],])])))
+  }
+  
+  return(rbind(temp.df, temp.df2))
+
+ message("----------------------------------------------------")
+ message("[<<<<            RR_stats START                >>>>>]")
+ message("[===================================================]")
+}
+
