@@ -34,7 +34,7 @@ RR_stats <- function(Object)
   temp.df[nrow(temp.df),1] <- mean(as.matrix(Data.RR))
   temp.df[nrow(temp.df),2] <- sd(as.matrix(Data.RR))
   
-  Idx <- combn(x = seq_len(6), m = 2,simplify = TRUE)
+  Idx <- combn(x = seq_len(max(Data.PD$cluster)), m = 2,simplify = TRUE)
   
   temp.df2 <- as.data.frame(matrix(0, nrow = ncol(Idx), ncol = 2))
   colnames(temp.df2) <- c("Mean", "SD")
