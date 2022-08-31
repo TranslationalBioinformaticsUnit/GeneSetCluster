@@ -65,6 +65,12 @@ MeanClusterDifferences <- function(Object)
     Cluster.Combo[cl.i,"Diff_A-B"] <- mean(as.numeric(diffs.vc))
     
   }
+  
+  Cluster.Combo <- as.data.frame(Cluster.Combo)
+ Cluster.Combo$Ratio_A_Diff <-  Cluster.Combo$`Diff_A-B` / Cluster.Combo$Diffs_A
+ Cluster.Combo$Ratio_B_Diff <- Cluster.Combo$`Diff_A-B` / Cluster.Combo$Diffs_B
+  
+  
  message("-----------------------------------------------------------")
  message("[<<<<<      MeanClusterDifferences END              >>>>>>]")
  message("[=========================================================]")
