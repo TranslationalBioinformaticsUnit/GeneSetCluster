@@ -11,16 +11,12 @@
 #' @param labels Labels of GeneSets to be highlighted
 #' @export
 
-
-UmapGeneSets <- function(Object, main = "", labels = "")
-{
- 
-  Object.umap <- umap(Object@Data.RR)
+Object.umap <- umap(Object@Data.RR)
   umap.labels <- (Object@Data[[1]]$cluster)
   
-  colors=brewer.pal(n = max((Object@Data[[1]]$cluster)), name = "Set1")
+  colors=brewer.pal(n = length(unique(Object@Data[[1]]$cluster)), name = "Set1")
   
-  labels <- labels[labels %in% colnames(Object@Data.RR)]
+ 
   
   layout <- Object.umap$layout
   
@@ -35,16 +31,16 @@ UmapGeneSets <- function(Object, main = "", labels = "")
          cex=1, pch=16)
   if(!labels[1] =="")
   {
+    labels <- labels[labels %in% colnames(Object@Data.RR)]
    idx <-  which(colnames(Object@Data.RR) %in% labels)
     
    text(layout[idx,1], layout[idx,2], labels)
   }
   
-  labels.u <- unique(labels)
+  labels.u <- unique(umap.labels)
   legend.pos <- "bottomright"
   legend.text <- as.character(labels.u)
   
   legend(legend.pos, legend=legend.text, inset=0.03,
          col=colors[as.integer(labels.u)],
          pch=16)
-}
