@@ -1,7 +1,13 @@
 
+
+
 GenesPerGeneset.Count.fc <- function(Object, annotate =F)
 {
   require(limma)
+  library(AnnotationDbi)
+  library(rentrez)
+  
+  
   clus.mol.ls <- list()
   for(clus.i in 1:max(Object@Data[[1]]$cluster))
   {
@@ -53,11 +59,12 @@ GenesPerGeneset.Count.fc <- function(Object, annotate =F)
                            mart       = mart)  
     }
     resultTable$match <- NA
-  for(i in 1:nrow(resultTable))
-  {
-    resultTable[i,"match"] <- which(resultTable[i,1] == unique.mol)
+    for(i in 1:nrow(resultTable))
+    {
+      resultTable[i,"match"] <- which(resultTable[i,1] == unique.mol)
+    }
     resultTable <- resultTable[!duplicated(resultTable$match),]
-  }
+    
     resultTable2 <- as.data.frame(matrix(NA, nrow = nrow(mol.unique.df), ncol = ncol(resultTable)))
     colnames(resultTable2) <- colnames(resultTable)
     resultTable2$match <- 1:nrow(mol.unique.df)
@@ -69,8 +76,79 @@ GenesPerGeneset.Count.fc <- function(Object, annotate =F)
     
     
     mol.unique.df <- cbind(mol.unique.df,resultTable2[,1:4])
-  }
+ 
   
+  #########################################
+  
+
+    #############
+    enterez.id <- mapIds(x = get(Object@metadata$organism[1]), 
+                         keys = mol.unique.df$hgnc_symbol,
+                         "ENTREZID", keytype =  'SYMBOL')
+    
+    enterez.id2 <- vector()
+    for(i in 1:length(enterez.id))
+    {
+      x <- c(names(enterez.id)[i], enterez.id[[i]])
+      if(is.na(x))
+      {
+        x <- c(NA, NA)
+      }
+      enterez.id2 <- rbind(enterez.id2, x)
+    }
+    colnames(enterez.id2) <- c("Gene", "entrez_ids")
+    enterez.id2 <- as.data.frame(enterez.id2)
+    enterez.id2$summary <- NA 
+    
+    mol.unique.df$entrez_ids <- enterez.id2[,2]
+    mol.unique.df$summary <- NA
+    
+    Annotation.batch <- list("1" = 1:500,
+                             "2" = 501:1000,
+                             "3" = 1001:1500,
+                             "4" = 1501:2000,
+                             "5" = 2001:2500,
+                             "6" = 2501:3000,
+                             "7" = 3001:3500,
+                             "8" = 3501:4000,
+                             "9" = 4001:4500,
+                             "10" = 45001:5000)
+    genes.summary <- vector()
+    for(num.i in 1:ceiling(nrow(mol.unique.df) / 500))
+    {
+      if(num.i < ceiling(nrow(mol.unique.df) / 500))
+      {
+        idx <- mol.unique.df[Annotation.batch[[num.i]], "entrez_ids"]
+        #na.idx <- which(is.na(idx))
+        idx <- idx[!is.na(idx)]
+        genes <- entrez_summary(db="gene", id=idx,always_return_list=T )
+        
+      }
+      if(num.i == ceiling(nrow(mol.unique.df) / 500))
+      {
+        idx <- mol.unique.df[min(Annotation.batch[[num.i]]):nrow(mol.unique.df), "entrez_ids"]
+        na.idx <- which(is.na(idx))
+        idx <- idx[!is.na(idx)]
+        genes <- entrez_summary(db="gene", id=idx,always_return_list=T )
+      }
+      temp <- (extract_from_esummary(genes, "summary"))
+      genes.summary <- c(genes.summary, temp)
+      
+      
+    }
+    genes.summary.df <- as.data.frame(cbind(entrez_ids = names(genes.summary), 
+                                            summary = genes.summary))
+    
+    for(i in 1:nrow(mol.unique.df))
+    {
+      if(is.na(enterez.id2[i,"entrez_ids"])){next()}
+      idx <- which(enterez.id2[i,"entrez_ids"] == genes.summary.df$entrez_ids)
+      
+      enterez.id2[i,"summary"] <- genes.summary.df[idx,"summary"]
+    }
+    
+    mol.unique.df$summary <- enterez.id2$summary
+  }
   ########################################
   return(mol.unique.df)          
 }
