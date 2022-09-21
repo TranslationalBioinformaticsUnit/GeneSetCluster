@@ -1,4 +1,5 @@
-GenesPerGeneset.Count.fc <- function(Object)
+
+GenesPerGeneset.Count.fc <- function(Object, annotate =F)
 {
   require(limma)
   clus.mol.ls <- list()
@@ -7,14 +8,18 @@ GenesPerGeneset.Count.fc <- function(Object)
     clus.x <- Object@Data[[1]][Object@Data[[1]]$cluster == clus.i,]
     clus.x$Molecules <- as.character(clus.x$Molecules)
     clus.mol.ls[[clus.i]] <- as.vector(strsplit2(clus.x$Molecules, split = Object@metadata$seperator[1]))
+    clus.mol.ls[[clus.i]] <- clus.mol.ls[[clus.i]][!clus.mol.ls[[clus.i]] == ""]
   }
   unique.mol <- unique(do.call(what = c, args = clus.mol.ls))
+  unique.mol <- unique.mol[!unique.mol == ""]
+  unique.mol <- unique.mol[!unique.mol == "1"]
   
   mol.unique.df <- as.data.frame(matrix(0, nrow = length(unique.mol), ncol = length(clus.mol.ls)))
   rownames(mol.unique.df) <- unique.mol
   colnames(mol.unique.df) <-  paste("Cluster_", 1:length(clus.mol.ls), sep="")
-  clus.mol.vc <- do.call(what = c, args = clus.mol.ls)
   
+  
+  clus.mol.vc <- do.call(what = c, args = clus.mol.ls)
   
   
   for(clus.i in 1:max(Object@Data[[1]]$cluster))
@@ -24,7 +29,48 @@ GenesPerGeneset.Count.fc <- function(Object)
       mol.unique.df[unique(clus.mol.ls[[clus.i]])[mol.i],clus.i] <- sum(clus.mol.ls[[clus.i]] %in% unique(clus.mol.ls[[clus.i]])[mol.i])
     }
   }
-  
 
-  return(mol.unique.df)          
+  ########################################
+  if(annotate == T)
+  {
+    require(biomaRt)
+    if(Object@metadata$organism[1] == "org.Hs.eg.db")
+    {
+      mart <- useDataset(dataset = "hsapiens_gene_ensembl",         
+                         mart    = useMart("ENSEMBL_MART_ENSEMBL", host    = "https://www.ensembl.org"))  
+      resultTable <- getBM(attributes = c("hgnc_symbol", "start_position","end_position","description"),       
+                           filters    = "hgnc_symbol",       
+                           values     = unique.mol,         
+                           mart       = mart)  
+    }
+    if(Object@metadata$organism[1] == "org.Mm.eg.db")
+    {
+      mart <- useDataset(dataset = "mmusculus_gene_ensembl",         
+                         mart    = useMart("ENSEMBL_MART_ENSEMBL", host    = "https://www.ensembl.org"))  
+      resultTable <- getBM(attributes = c("mgi_symbol", "start_position","end_position","description"),       
+                           filters    = "mgi_symbol",       
+                           values     = unique.mol,         
+                           mart       = mart)  
+    }
+    resultTable$match <- NA
+  for(i in 1:nrow(resultTable))
+  {
+    resultTable[i,"match"] <- which(resultTable[i,1] == unique.mol)
+    resultTable <- resultTable[!duplicated(resultTable$match),]
   }
+    resultTable2 <- as.data.frame(matrix(NA, nrow = nrow(mol.unique.df), ncol = ncol(resultTable)))
+    colnames(resultTable2) <- colnames(resultTable)
+    resultTable2$match <- 1:nrow(mol.unique.df)
+    
+    for(i in 1:nrow(resultTable))
+    {
+      resultTable2[resultTable2$match == resultTable[i,"match"], ] <- resultTable[i,] 
+    }
+    
+    
+    mol.unique.df <- cbind(mol.unique.df,resultTable2[,1:4])
+  }
+  
+  ########################################
+  return(mol.unique.df)          
+}
