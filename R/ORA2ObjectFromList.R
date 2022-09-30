@@ -84,8 +84,10 @@ ORA2Cluster.List.fc <- function(Data,
   ORA.df$nMolecules <- ncol(x) - rowSums(x == "")
   ORA.df <- ORA.df[ORA.df$nMolecules > Mol.cutoff,]
   
-  
-  
+  if(structure == "genesymbol")
+  {
+    structure <- "SYMBOL"
+  }
   
   Object <- ObjectCreator(Pathways= paste0(ORA.df$geneSet, "_", ORA.df$description), 
                           Molecules = ORA.df$userId, 
@@ -95,7 +97,10 @@ ORA2Cluster.List.fc <- function(Data,
                           structure = structure, 
                           sep = ";", 
                           organism = organism)
-    
+  
+  Object@Data[[1]]$Pval <- ORA.df$FDR
+  Object@Data[[1]]$Ratio <- ORA.df$enrichmentRatio
+  
   message("-----------------------------------------------------------")
   message("[<<<<<               ORA2Cluster.List.fc END         >>>>>>]")
   message("[=========================================================]")
