@@ -107,6 +107,7 @@ CombineGeneSets <- function(Object, combineMethod="Standard", combineMethod.supp
     message("transforming all genes to upper case, make sure this doesnt change the data")
     message(paste( "raw data has " , length(unique(molecules))," genes", sep=""))
     molecules <- toupper(molecules)
+    molecules <- unique(molecules)
     message(paste( "Transformed data has " , length(unique(molecules))," genes", sep=""))
   }
 
