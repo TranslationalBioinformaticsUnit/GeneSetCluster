@@ -111,16 +111,16 @@ ORA2Cluster.List.fc <- function(Data,
 }
 
 
-Data <- list(L1 = PBMC.RTX.HCvsBS_BSvsBS.Age.Sex.Duration$Contrasts$HCvsB1.BS$limma[PBMC.RTX.HCvsBS_BSvsBS.Age.Sex.Duration$Contrasts$HCvsB1.BS$limma$P.Value < 0.001,],
-             L2 = PBMC.RTX.HCvsBS_BSvsBS.Age.Sex.Duration$Contrasts$HCvsB2.BS$limma[PBMC.RTX.HCvsBS_BSvsBS.Age.Sex.Duration$Contrasts$HCvsB2.BS$limma$P.Value < 0.001,])
+#Data <- list(L1 = PBMC.RTX.HCvsBS_BSvsBS.Age.Sex.Duration$Contrasts$HCvsB1.BS$limma[PBMC.RTX.HCvsBS_BSvsBS.Age.Sex.Duration$Contrasts$HCvsB1.BS$limma$P.Value < 0.001,],
+#             L2 = PBMC.RTX.HCvsBS_BSvsBS.Age.Sex.Duration$Contrasts$HCvsB2.BS$limma[PBMC.RTX.HCvsBS_BSvsBS.Age.Sex.Duration$Contrasts$HCvsB2.BS$limma$P.Value < 0.001,])
+#
 
-
-Data$L1$Gene <- as.character(probe.features.merged[rownames(Data$L1),"gene"])
-Data$L2$Gene <- as.character(probe.features.merged[rownames(Data$L2),"gene"])
-
-Test.Object <-ORA2Cluster.List.fc (Data,
-                     structure = "genesymbol",
-                     enrichMethod = "ORA", 
-                     organism = "org.Hs.eg.db",
-                     enrichDatabase = "geneontology_Biological_Process",
-                     Mol.cutoff = 5)
+#Data$L1$Gene <- as.character(probe.features.merged[rownames(Data$L1),"gene"])
+3Data$L2$Gene <- as.character(probe.features.merged[rownames(Data$L2),"gene"])
+#
+#Test.Object <-ORA2Cluster.List.fc (Data,
+#                     structure = "genesymbol",
+#                     enrichMethod = "ORA", 
+#                     organism = "org.Hs.eg.db",
+#                     enrichDatabase = "geneontology_Biological_Process",
+#                     Mol.cutoff = 5)
