@@ -94,7 +94,7 @@ setMethod(f="TissueExpressionPerGeneSet",
           genes.selected <- dic.selected$GTEx.median.TPM.Name
           }
 
-          if (length(genes.selected == 0)) {
+          if (length(genes.selected) == 0) {
             stop("The genes used to create the object are not correct. Please make sure they are introduced either as GENE SYMBOL or ENSEMBL ID.")
           }
 
