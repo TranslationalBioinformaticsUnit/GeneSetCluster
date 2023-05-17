@@ -94,6 +94,10 @@ setMethod(f="TissueExpressionPerGeneSet",
           genes.selected <- dic.selected$GTEx.median.TPM.Name
           }
 
+          if (length(genes.selected == 0)) {
+            stop("The genes used to create the object are not correct. Please make sure they are introduced either as GENE SYMBOL or ENSEMBL ID.")
+          }
+
           #GTEx API REST query of median Gene Expression: database -> gtex_v8
           message(paste("Performing GTEx API REST queries for ", length(genes.selected), " genes. Using ", threads, " cores.", sep=""))
           urls <- paste("https://gtexportal.org/rest/v1/expression/medianGeneExpression?datasetId=gtex_v8&gencodeId=", genes.selected, sep="")
