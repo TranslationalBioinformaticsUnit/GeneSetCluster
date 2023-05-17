@@ -86,8 +86,13 @@ setMethod(f="TissueExpressionPerGeneSet",
           mol.unique.df <- GenesPerGeneSet(Object)
           genes <- rownames(mol.unique.df)
 
+          if (substr(genes[1], 1, 4) == "ENSG") {
+            dic.selected <- dic[which(dic$GTEx.median.TPM.Name %in% toupper(genes)),]
+            genes.selected <- dic.selected$GTEx.median.TPM.Name
+          } else {
           dic.selected <- dic[which(dic$GTEx.median.TPM.Description %in% toupper(genes)),]
           genes.selected <- dic.selected$GTEx.median.TPM.Name
+          }
 
           #GTEx API REST query of median Gene Expression: database -> gtex_v8
           message(paste("Performing GTEx API REST queries for ", length(genes.selected), " genes. Using ", threads, " cores.", sep=""))
