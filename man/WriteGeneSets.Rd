@@ -4,8 +4,12 @@
 \alias{WriteGeneSets}
 \title{WriteGeneSets}
 \usage{
-WriteGeneSets(Object, file_location = "~/Project9/test/",
-  name = "IPA_20181123", write = "Both")
+WriteGeneSets(
+  Object,
+  file_location = "~/Project9/test/",
+  name = "IPA_20181123",
+  write = "Both"
+)
 }
 \arguments{
 \item{Object}{is a PathwayObject.}

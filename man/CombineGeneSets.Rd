@@ -4,8 +4,13 @@
 \alias{CombineGeneSets}
 \title{CombineGeneSets}
 \usage{
-CombineGeneSets(Object, combineMethod = "Standard",
-  combineMethod.supplied, display = "Condensed")
+CombineGeneSets(
+  Object,
+  combineMethod = "Standard",
+  combineMethod.supplied,
+  display = "Condensed",
+  threads = 1
+)
 }
 \arguments{
 \item{Object}{A PathwayObject.}

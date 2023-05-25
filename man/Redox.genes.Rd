@@ -4,11 +4,13 @@
 \name{Redox.genes}
 \alias{Redox.genes}
 \title{Redox.genes}
-\format{A vector with 513 gene names variables:
+\format{
+A vector with 513 gene names variables:
 \describe{
   \item{genes}{gene names}
   ...
-}}
+}
+}
 \source{
 \url{http://www.informatics.jax.org/vocab/gene_ontology/GO:0000302}
 }

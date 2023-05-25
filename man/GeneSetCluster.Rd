@@ -3,7 +3,6 @@
 \docType{package}
 \name{GeneSetCluster}
 \alias{GeneSetCluster}
-\alias{GeneSetCluster-package}
 \title{GeneSetCluster package}
 \description{
 This is a package meant to be used to cluster together Gene-Sets from pathway tools to aid in biological interpretation.

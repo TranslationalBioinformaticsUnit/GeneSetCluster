@@ -23,5 +23,9 @@ PathwayObject
 \item{\code{plot}}{list.}
 
 \item{\code{Data.RR}}{data.frame.}
+
+\item{\code{DataPathways.RR}}{data.frame.}
+
+\item{\code{dfTissue}}{data.frame.}
 }}
 

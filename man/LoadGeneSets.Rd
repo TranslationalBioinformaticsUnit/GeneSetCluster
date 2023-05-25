@@ -4,11 +4,19 @@
 \alias{LoadGeneSets}
 \title{LoadGeneSets}
 \usage{
-LoadGeneSets(file_location = canonical.files,
+LoadGeneSets(
+  file_location = canonical.files,
   groupnames = c("MClust_1", "MClust_26", "MClust_3457"),
-  P.cutoff = 1.3, Mol.cutoff = 5, Source = "IPA",
-  Great.Background = F, type = "Canonical_Pathways", topranks = "",
-  structure = "SYMBOL", Organism = "org.Mm.eg.db", seperator = ",")
+  P.cutoff = 1.3,
+  Mol.cutoff = 5,
+  Source = "IPA",
+  Great.Background = F,
+  type = "Canonical_Pathways",
+  topranks = "",
+  structure = "SYMBOL",
+  Organism = "org.Mm.eg.db",
+  seperator = ","
+)
 }
 \arguments{
 \item{file_location}{A location string in a vector.}
@@ -23,7 +31,7 @@ LoadGeneSets(file_location = canonical.files,
 
 \item{Great.Background}{If the Great tool was used, did the user supply a background.}
 
-\item{type}{For IPA data if Canonical pathways or Functional Anotations were supplied.}
+\item{type}{For IPA data if "Canonical_Pathways" or "Functional_annotations" were supplied.}
 
 \item{topranks}{numeric with the number of ranks per group to be loaded, usefull when there is a lot of data.}
 
