@@ -77,8 +77,8 @@ setMethod(f="PlotPathwayCluster",
   df_metadata <- obtainDFmetadata(Object@Data[[1]], mat_cor)
 
   annot_top <- HeatmapAnnotation(df=df_metadata, show_legend = F, annotation_name_gp = gpar(fontsize = 10))
-  ht_opt$message = FALSE
-  plot <- Heatmap(mat_cor, cluster_rows = F, cluster_columns = F, show_row_names =F, show_column_names = F ,
+  ht_opt$message <- FALSE
+  plot <- Heatmap(mat_cor, cluster_rows = F, cluster_columns = F, show_row_names = F, show_column_names = F ,
                   name="GO", top_annotation = annot_top) + annot_label
 
   return(plot)

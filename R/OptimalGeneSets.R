@@ -11,6 +11,7 @@
 #' @param max_cluster Max number of clusters to test
 #' @param cluster_method kmeans or hcut. Which clustering method is used
 #' @param main A string to be used as title in the plot
+#' @param pathwayData Boolean to set Pathway or Cluster data
 #'
 #' @return a plot
 #'
@@ -36,13 +37,16 @@
 #'                            structure = "SYMBOL",
 #'                            seperator = ",")
 #'IPA.object2 <- CombineGeneSets(Object = IPA.object1)
-#'OptimalGeneSets(object = IPA.object2, method = "elbow", max_cluster= 24,
+#'OptimalGeneSets(Object = IPA.object2, method = "elbow", max_cluster= 24,
 #'                cluster_method = "kmeans", main= "Kmeans for 24 clusters")
+#'
+#'OptimalGeneSets(Object = IPA.object2, method = "elbow", max_cluster= 24,
+#'                cluster_method = "kmeans", main= "Kmeans for 24 clusters", pathwayData = FALSE")
 #'
 #' @export
 #'
 #'
-OptimalGeneSets <- function(object, method, max_cluster, cluster_method, main)
+OptimalGeneSets <- function(Object, method, max_cluster, cluster_method, main, pathwayData = FALSE)
 {
 
   message("[=========================================================]")
@@ -57,7 +61,11 @@ OptimalGeneSets <- function(object, method, max_cluster, cluster_method, main)
   message(paste("Clustering method = ", cluster_method))
   message(paste("Optimizing method = ", method))
 
-
+  if (pathwayData == TRUE) {
+    RRData <- Object@DataPathways.RR
+  } else {
+    RRData <- Object@Data.RR
+  }
 
   ######################################
   ##---------elbow--------------------##
@@ -65,7 +73,7 @@ OptimalGeneSets <- function(object, method, max_cluster, cluster_method, main)
 
   if(method == "elbow")
   {
-    plot.x <-   fviz_nbclust(object@Data.RR, get(cluster_method), method = "wss", k.max = max_cluster) +ggtitle(paste(main,": The Elbow method",sep=""))
+    plot.x <-   fviz_nbclust(RRData, get(cluster_method), method = "wss", k.max = max_cluster) +ggtitle(paste(main,": The Elbow method",sep=""))
   }
   ######################################
   ##---------gap----------------------##
@@ -73,8 +81,8 @@ OptimalGeneSets <- function(object, method, max_cluster, cluster_method, main)
 
   if(method == "gap")
   {
-    gap_stat <- clusGap(object@Data.RR, get(cluster_method), K.max = max_cluster, B = 50)
-    plot.x <-    fviz_gap_stat(gap_stat) + ggtitle(paste(main,": Gap Statistics",sep=""))
+    gap_stat <- clusGap(RRData, get(cluster_method), K.max = max_cluster, B = 50)
+    plot.x <- fviz_gap_stat(gap_stat) + ggtitle(paste(main,": Gap Statistics",sep=""))
   }
 
   ######################################
@@ -83,7 +91,7 @@ OptimalGeneSets <- function(object, method, max_cluster, cluster_method, main)
 
   if(method == "silhouette")
   {
-    plot.x <-  fviz_nbclust(x = object@Data.RR,get(cluster_method), method = "silhouette", k.max = max_cluster) + ggtitle(paste(main,": The Silhouette Plot",sep=""))
+    plot.x <-  fviz_nbclust(x = RRData, get(cluster_method), method = "silhouette", k.max = max_cluster) + ggtitle(paste(main,": The Silhouette Plot",sep=""))
   }
 
   message("-----------------------------------------------------------")

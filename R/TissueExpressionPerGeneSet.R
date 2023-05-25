@@ -79,19 +79,37 @@ setMethod(f="TissueExpressionPerGeneSet",
             threads <- detectCores()
           }
 
-          message("Please make sure that you are using GENE SYMBOLs.")
+          options <- c("SYMBOL", "ENTREZID", "ENSEMBLID", "ENTREZ", "ENSEMBL")
+          entrezOptions <- c("ENTREZID", "ENTREZ")
+          ensemblOptions <- c("ENSEMBL", "ENSEMBLID")
+
+          if (!toupper(Object@metadata$structure[1]) %in% options) {
+            message("Genes are not included as genes Symbol, EntrezID or ENSEMBLID.\nSo TissuePerGeneSet will NOT be performed.")
+            message("Please make sure that you are using one of the followings: GENE SYMBOL, ENTREZID or ENSEMBLID.")
+            stop()
+          }
+
 
           data("dic", package = "GeneSetCluster")
 
           mol.unique.df <- GenesPerGeneSet(Object)
           genes <- rownames(mol.unique.df)
 
-          if (substr(genes[1], 1, 4) == "ENSG") {
+          if (substr(genes[1], 1, 3) == "ENS") {
             dic.selected <- dic[which(dic$GTEx.median.TPM.Name %in% toupper(genes)),]
             genes.selected <- dic.selected$GTEx.median.TPM.Name
+          } else if (toupper(Object@metadata$structure[1]) %in% entrezOptions) {
+            usingOrg <- obtainOrg(Object)
+            resSymbol <- AnnotationDbi::select(usingOrg, keys=genes, columns='SYMBOL', keytype='ENTREZID')
+
+            dic.selected <- dic[which(dic$GTEx.median.TPM.Description %in% toupper(resSymbol$SYMBOL)),]
+            genes.selected <- dic.selected$GTEx.median.TPM.Name
+            colnames(dic.selected) <- c("ENSEMBLID", "SYMBOL")
+            dicreference <- merge(resSymbol, dic.selected, by="SYMBOL")
+
           } else {
-          dic.selected <- dic[which(dic$GTEx.median.TPM.Description %in% toupper(genes)),]
-          genes.selected <- dic.selected$GTEx.median.TPM.Name
+            dic.selected <- dic[which(dic$GTEx.median.TPM.Description %in% toupper(genes)),]
+            genes.selected <- dic.selected$GTEx.median.TPM.Name
           }
 
           if (length(genes.selected) == 0) {
@@ -117,19 +135,32 @@ setMethod(f="TissueExpressionPerGeneSet",
           results_df2 <- lapply(results_df, function(x) dcast(x, V1+V2~V3, value.var = "V4"))
           results_df3 <- lapply(results_df2, function(x) cbind(x))
           GTEx.info <- results_df3[[1]] #initialize the dataframe
-          for (i in 2:length(results_df3))
-          {
+          for (i in 2:length(results_df3)) {
             GTEx.info = bind_rows(GTEx.info, results_df3[[i]])
           }
 
           GTEx.info[,3:ncol(GTEx.info)] <- apply(GTEx.info[,3:ncol(GTEx.info)], 2, as.numeric)
           colnames(GTEx.info)[c(1,2)] = c("Name", "Description")
 
-          tissue.df <- colMeans(GTEx.info[GTEx.info$Description %in% rownames(mol.unique.df[mol.unique.df[,1] == 1,]),3:ncol(GTEx.info)])
-          rownames(mol.unique.df) <- toupper(rownames(mol.unique.df))
-          for (i in 2:ncol(mol.unique.df)) {
-            tissue.df <- cbind(tissue.df, colMeans(GTEx.info[GTEx.info$Description %in% rownames(mol.unique.df[mol.unique.df[,i] == 1,]),3:ncol(GTEx.info)]))
+          if (toupper(Object@metadata$structure[1]) %in% entrezOptions) {
+              colnames(dicreference)[1] <- ("Description")
+              GTEx.info2 <- merge(dicreference[,c("Description", "ENTREZID")], GTEx.info, by="Description")
+              tissue.df <- colMeans(GTEx.info[GTEx.info2$ENTREZID %in% rownames(mol.unique.df[mol.unique.df[,1] == 1,]),3:ncol(GTEx.info)])
+
+              rownames(mol.unique.df) <- toupper(rownames(mol.unique.df))
+              for (i in 2:ncol(mol.unique.df)) {
+                tissue.df <- cbind(tissue.df, colMeans(GTEx.info[GTEx.info2$ENTREZID %in% rownames(mol.unique.df[mol.unique.df[,i] == 1,]),3:ncol(GTEx.info)], na.rm = T))
+              }
+
+          } else {
+             tissue.df <- colMeans(GTEx.info[GTEx.info$Description %in% rownames(mol.unique.df[mol.unique.df[,1] == 1,]),3:ncol(GTEx.info)])
+             rownames(mol.unique.df) <- toupper(rownames(mol.unique.df))
+             for (i in 2:ncol(mol.unique.df)) {
+               tissue.df <- cbind(tissue.df, colMeans(GTEx.info[GTEx.info$Description %in% rownames(mol.unique.df[mol.unique.df[,i] == 1,]),3:ncol(GTEx.info)]))
+             }
           }
+
+
           colnames(tissue.df) <- colnames(mol.unique.df)
           Object@dfTissue <- tissue.df
 

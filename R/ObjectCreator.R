@@ -49,9 +49,8 @@
 #'
 #'
 #'
-
 #'
-ObjectCreator <- function(Pathways, Molecules, Groups, Source, Type, structure, sep, organism = NA)
+ObjectCreator <- function(Pathways, Molecules, Groups, Source, Type, structure, sep, organism = NA, Pvalues = NA, enrichmentScore = NA)
 {
   message("[=========================================================]")
   message("[<<<<            ObjectCreator START                 >>>>>]")
@@ -67,7 +66,9 @@ ObjectCreator <- function(Pathways, Molecules, Groups, Source, Type, structure, 
   Data$Pathways <- Pathways
   Data$Molecules <- Molecules
   Data$Groups <- Groups
+  Data$Pval <- Pvalues
   Data$Type <- rep(Type, times = nrow(Data))
+  Data$enrichScore <- enrichmentScore
 
   for(can.i in 1:nrow(Data))
   {
@@ -113,7 +114,8 @@ ObjectCreator <- function(Pathways, Molecules, Groups, Source, Type, structure, 
                            metadata = metadata,
                            Data.RR = data.frame(),
                            plot = list(aka2 = data.frame(),
-                                       aka3 = data.frame()))
+                                       aka3 = data.frame()),
+                           dfTissue = data.frame())
 
 
   message("-----------------------------------------------------------")
