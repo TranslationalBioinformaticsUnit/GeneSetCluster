@@ -20,6 +20,7 @@ setGeneric(name="PlotTreePathway",
            }
 )
 
+
 #' PlotTreePathway
 #'
 #' @param Object a pathway object
