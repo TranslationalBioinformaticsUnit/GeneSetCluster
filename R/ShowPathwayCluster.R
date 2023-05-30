@@ -66,7 +66,11 @@ setMethod(f="ShowPathwayCluster",
     cluster = "ALL"
   }
 
-  GOres <- lapply(go_id_list, obtainGOdescription)
+  if (checkGO(Object)) {
+    GOres <- lapply(go_id_list, obtainGOdescription)
+  } else {
+    GOres <- go_id_list
+  }
 
   if (toupper(cluster) == "ALL") {
     finalRes <- GOres

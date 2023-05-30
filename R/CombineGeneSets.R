@@ -342,7 +342,7 @@ CombineGeneSets <- function(Object, combineMethod="Standard", combineMethod.supp
 
         cl <- makeCluster(threads)
         registerDoParallel(cl)
-        foreach(Disease1=1:nrow(RR[]),  .export="RR.function") %dopar% {
+        foreach(Disease1=1:nrow(RR[])) %dopar% {
 
           RR[Disease1,] <- apply(X = pathways.mtx, MARGIN = 1, FUN = RR.function )
 
@@ -351,7 +351,7 @@ CombineGeneSets <- function(Object, combineMethod="Standard", combineMethod.supp
 
         cl <- makeCluster(threads)
         registerDoParallel(cl)
-        foreach(Disease1=1:nrow(RR2[]),  .export="RR.function2") %dopar% {
+        foreach(Disease1=1:nrow(RR2[])) %dopar% {
 
           RR2[Disease1,] <- apply(X = pathways.mtx2, MARGIN = 1, FUN = RR.function2 )
 

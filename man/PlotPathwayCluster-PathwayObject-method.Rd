@@ -4,12 +4,14 @@
 \alias{PlotPathwayCluster,PathwayObject-method}
 \title{PlotPathwayCluster}
 \usage{
-\S4method{PlotPathwayCluster}{PathwayObject}(Object, nPathway = 4)
+\S4method{PlotPathwayCluster}{PathwayObject}(Object, nPathway = 6, doORA = TRUE, wordcloud = TRUE)
 }
 \arguments{
 \item{Object}{a pathway object}
 
 \item{nPathway}{minimum number of pathways per group}
+
+\item{doORA}{boolean perform ORA analysis}
 }
 \value{
 plot

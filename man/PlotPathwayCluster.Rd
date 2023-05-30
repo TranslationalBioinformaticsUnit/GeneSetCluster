@@ -4,12 +4,14 @@
 \alias{PlotPathwayCluster}
 \title{PlotPathwayCluster}
 \usage{
-PlotPathwayCluster(Object, nPathway = 4)
+PlotPathwayCluster(Object, nPathway = 6, doORA = TRUE, wordcloud = TRUE)
 }
 \arguments{
 \item{Object}{a pathway object}
 
 \item{nPathway}{minimum number of pathways per group}
+
+\item{doORA}{boolean perform ORA analysis}
 }
 \value{
 plot

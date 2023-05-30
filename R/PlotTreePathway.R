@@ -2,6 +2,14 @@
 #'
 #' Plots a tree plot with the distances per pathway.
 #' @import ggplot2
+#' @import tidyverse
+#' @import stats
+#' @import ggdendro
+#' @import cowplot
+#' @import clusterProfiler
+#' @import ggtree
+#' @import patchwork
+#' @import RColorBrewer
 #'
 #' @param Object a pathway object
 #' @param clusters A numeric with the number of clusters required
@@ -14,7 +22,7 @@
 #' @export
 #'
 setGeneric(name="PlotTreePathway",
-           def=function(Object, clusters = 3, nodenames = TRUE, doORA = TRUE, wordcloud  =TRUE)
+           def=function(Object, clusters = 3, nodenames = TRUE, doORA = TRUE, wordcloud = TRUE)
            {
              standardGeneric("PlotTreePathway")
            }
@@ -47,23 +55,12 @@ setMethod(f="PlotTreePathway",
           signature = "PathwayObject",
           definition = function(Object, clusters = 3, nodenames = TRUE, doORA = TRUE, wordcloud = TRUE)
           {
-#
-#           library(ggplot2)
-#           library(tidyverse)
-#           library(ggdendro)
-#           library(cowplot)
-#           library(clusterProfiler)
-#           library(ggtree)
-#           library(patchwork)
-#           library(org.Hs.eg.db)
-#           library(org.Mm.eg.db)
-#           library(RColorBrewer)
 
           hc <- hclust(as.dist(1 - Object@DataPathways.RR),method = "ward.D")
           # Info of Clusters wanted
           clus <- cutree(hc, clusters)
 
-          keywords <- ORAperCluster(Object, doORA, clusters)
+          keywords <- ORAperCluster(Object, doORA, clusters, clus)
 
           #For leyend adjust proportionaly to terms length
           keywords_max_length <- max(nchar(as.list(keywords)))
@@ -128,24 +125,14 @@ setMethod(f="PlotTreePathway",
             theme(axis.ticks = element_blank(), legend.position = "right", legend.justification = c(0,0))
           dotplot_noLegend <- dotplot + theme(legend.position = "none")
 
-          # adjusting word cloud annotation
-          if (clusters <= 3) {
-            vjustValue <- -6
-            fontsizeValue <- 18
-          } else if (clusters <= 5) {
-              vjustValue <- -5
-              fontsizeValue <- 14
-          } else if (clusters <= 7) {
-            vjustValue <- -5
-            fontsizeValue <- 12
-          } else {
-            vjustValue <- -5
-            fontsizeValue <- 12
+          if (checkGO(Object) == FALSE) {
+            message("No GO terms have been detected in the pathways. The semantic enrichment word cloud will not be generated.")
+            wordcloud = FALSE
           }
 
           if (wordcloud == TRUE) {
             plotList <- list()
-            for (i in 1:8) {
+            for (i in 1:clusters) {
               list <- names(clus[clus == i])
               plot <- wordcloud_generation(list)
               # plot <- plot + annotation_custom(grob = textGrob(label = paste0("Cluster ", i), hjust = 0.5, vjust = -6,
@@ -165,9 +152,9 @@ setMethod(f="PlotTreePathway",
 
           # Merge Plot
           combine_plot <- plot_grid(ggtree_plot_noLegend, NULL, dotplot_noLegend, nrow= 1, rel_widths= c(0.3,-0.01,2), align = 'h')
-          combine_legend <- plot_grid(legend_dot,NULL,legend_tree, ncol=1, rel_heights = c(1,-0.6,1))
+          combine_legend <- plot_grid(legend_dot,NULL,legend_tree, ncol=1, rel_heights = c(1,-0.3,1))
           big_plot <- plot_grid(combine_plot, combine_legend, NULL, NULL, word_plot, nrow = 1,
-                                rel_widths = c(1, 0.1, keywords_max_length*0.0083, 0.001, 0.35))
+                                rel_widths = c(1, 0.1, keywords_max_length*0.0083, 0.00075, 0.35))
 
           return(big_plot)
           }
