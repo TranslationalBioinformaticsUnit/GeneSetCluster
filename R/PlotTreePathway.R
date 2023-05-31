@@ -86,7 +86,7 @@ setMethod(f="PlotTreePathway",
 
           enrichmentScore <- Object@Data[[1]]$enrichScore
           legendEnrichmentScore <- TRUE
-          if (length(enrichmentScore) == 0) {
+          if (length(enrichmentScore) == 0 | anyNA(Object@Data[[1]]$enrichScore)) {
             message("Enrichment scores not detected.")
             legendEnrichmentScore <- FALSE
           }
@@ -101,10 +101,17 @@ setMethod(f="PlotTreePathway",
           }
 
           colnames(results) <- c("Term", "Pathway")
+
+          results$Term[which(nchar(results$Term)>50)] <- paste0(substr(results$Term[which(nchar(results$Term)>50)], 1, 30), "...", substr(results$Pathway[which(nchar(results$Term)>50)],1,10), sep="")
+
           results_unique <- results[!duplicated(results), ]
           rownames(results_unique) <- results_unique$Pathway
+
+
           Description <- factor(results$Term,
                                 levels = convertNA(results_unique[hc$labels[hc$order], "Term"]))
+
+
           Cluster <- factor(Object@Data[[1]][,"Groups"])
 
           # Prepare for dotplot

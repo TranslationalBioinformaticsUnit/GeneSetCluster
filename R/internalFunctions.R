@@ -150,15 +150,15 @@ wordcloud_generation <- function(go_id_list, min_stat=5) {
 
   wordplot <- ggplot(df, aes(label = df[,1], size = df[,2])) +
                              # color = factor(sample.int(10, nrow(df), replace = TRUE)))) + #to add colour
-    geom_text_wordcloud(shape="square") +
-    theme_minimal() +
-    labs(title = "")+
-    theme(
-      plot.title = element_blank(),
-      legend.title = element_blank(),
-      legend.background = element_blank(),
-      legend.box.spacing = unit(0, "mm")
-    )
+                    geom_text_wordcloud(shape="square") +
+                    theme_minimal() +
+                    labs(title = "")+
+                    theme(
+                      plot.title = element_blank(),
+                      legend.title = element_blank(),
+                      legend.background = element_blank(),
+                      legend.box.spacing = unit(0, "mm")
+                    )
 
   return(wordplot)
 }
