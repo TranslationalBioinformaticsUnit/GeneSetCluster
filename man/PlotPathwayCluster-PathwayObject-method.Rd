@@ -12,6 +12,8 @@
 \item{nPathway}{minimum number of pathways per group}
 
 \item{doORA}{boolean perform ORA analysis}
+
+\item{wordcloud}{boolean perform boolean to add wordcloud annotations of each cluster}
 }
 \value{
 plot

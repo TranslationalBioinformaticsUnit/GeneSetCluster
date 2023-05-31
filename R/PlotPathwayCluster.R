@@ -10,6 +10,7 @@
 #' @param Object a pathway object
 #' @param nPathway minimum number of pathways per group
 #' @param doORA boolean perform ORA analysis
+#' @param wordcloud boolean perform boolean to add wordcloud annotations of each cluster
 #'
 #' @return plot
 #'
