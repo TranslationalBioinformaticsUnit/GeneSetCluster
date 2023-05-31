@@ -37,7 +37,6 @@ setMethod(f="PlotPathwayCluster",
           definition = function(Object, nPathway = 6, doORA= TRUE, wordcloud = TRUE)
 {
   df <- Object@DataPathways.RR
-  maxgo <- max(df)
   ordergo <- hclust(1 - as.dist(df))$order
   mat_cor <- cor(df[ordergo, ordergo])
 

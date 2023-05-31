@@ -78,7 +78,7 @@ setMethod(f="PlotTreePathway",
 
           log_p.adjust <- -log10(as.numeric(Object@Data[[1]]$Pval))
           dolegend_dot <- TRUE
-          if (length(log_p.adjust) == 0) {
+          if (length(log_p.adjust) == 0 | anyNA(log_p.adjust)) {
             message("P values not detected. Setting all values to 0.05 as default.")
             log_p.adjust <- rep(0.05, length(Object@Data[[1]][,"Pathways"]))
             dolegend_dot <- FALSE
