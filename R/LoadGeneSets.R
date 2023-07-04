@@ -315,7 +315,8 @@ LoadGeneSets <- function(file_location = canonical.files,
                            metadata = metadata,
                            Data.RR = data.frame(),
                            plot = list(aka2 = data.frame(),
-                                       aka3 = data.frame()))
+                                       aka3 = data.frame()),
+                           dfTissue = data.frame())
 
 
   message("-----------------------------------------------------------")

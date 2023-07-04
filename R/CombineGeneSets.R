@@ -6,6 +6,11 @@
 #' @import limma
 #' @import org.Hs.eg.db
 #' @import org.Mm.eg.db
+#' @import bigstatsr
+#' @import parallel
+#' @import doParallel
+#' @import foreach
+#' @import limma
 #' @param Object A PathwayObject.
 #' @param combineMethod lets the functions know if the standard RR, a Jaccard index or Cohens Kappa.
 #' @param combineMethod.supplied a function which parameter A and parameter B.
@@ -45,7 +50,7 @@
 #'
 
 
-CombineGeneSets <- function(Object, combineMethod="Standard", combineMethod.supplied, display="Condensed")
+CombineGeneSets <- function(Object, combineMethod="Standard", combineMethod.supplied, display="Condensed", threads=1)
 {
   message("[=========================================================]")
   message("[<<<<            CombineGeneSets START               >>>>>]")
@@ -126,6 +131,7 @@ CombineGeneSets <- function(Object, combineMethod="Standard", combineMethod.supp
     pathways.i <- do.call(rbind, Object@Data)
 
   }
+  pathways.i2 <- pathways.i[!duplicated(pathways.i$Pathways), ]
   pathways.i$GeneSets <- paste("GeneSet",1:nrow(pathways.i),sep="")
 
   ################################################
@@ -155,20 +161,20 @@ CombineGeneSets <- function(Object, combineMethod="Standard", combineMethod.supp
 
   }
 
-
   #####################################
   ##---------Calculate RR------------##
   #####################################
   if(combineMethod == "Standard" | combineMethod == "RR")
   {
     message("calulating RR")
+
   }else{
     message(paste("calulating",combineMethod))
   }
   pathways.mtx <- matrix(data = 0, nrow = nrow(pathways.i), ncol = length(molecules))
   colnames(pathways.mtx) <- molecules
   rownames(pathways.mtx) <- as.character(pathways.i$Pathways)
-  #
+
 
   for(list.i in 1:nrow(pathways.i))
   {
@@ -178,11 +184,37 @@ CombineGeneSets <- function(Object, combineMethod="Standard", combineMethod.supp
 
   ##
   pathways.i$RR_name <- paste(pathways.i[,"Groups"],rownames(pathways.mtx),sep="_")
+
   ##
 
-  RR <- matrix(data = 0, nrow = nrow(pathways.mtx), ncol = nrow(pathways.mtx))
-  rownames(RR) <-  pathways.i$RR_name
-  colnames(RR) <-  pathways.i$RR_name
+  if (threads == 1) {
+    RR <- matrix(data = 0, nrow = nrow(pathways.mtx), ncol = nrow(pathways.mtx))
+    rownames(RR) <-  pathways.i$RR_name
+    colnames(RR) <-  pathways.i$RR_name
+  } else {
+  RR <- as_FBM(matrix(data = 0, nrow = nrow(pathways.mtx), ncol = nrow(pathways.mtx)))
+  }
+
+  ## For RR with unique pathways
+  pathways.mtx2 <- matrix(data = 0, nrow = nrow(pathways.i2), ncol = length(molecules))
+  colnames(pathways.mtx2) <- molecules
+  rownames(pathways.mtx2) <- as.character(pathways.i2$Pathways)
+
+  for(list.i2 in 1:nrow(pathways.i2))
+  {
+    molecules.i2 <- toupper(as.vector(strsplit2(pathways.i2[list.i2, "Molecules"], split=Object@metadata[1,"seperator"])))
+    pathways.mtx2[list.i2, molecules.i2] <- 1
+  }
+
+  pathways.i2$RR_name <- rownames(pathways.mtx2)
+
+  if (threads == 1) {
+    RR2 <- matrix(data = 0, nrow = nrow(pathways.mtx2), ncol = nrow(pathways.mtx2))
+    rownames(RR2) <-  pathways.i2$RR_name
+    colnames(RR2) <-  pathways.i2$RR_name
+  } else {
+    RR2 <- as_FBM(matrix(data = 0, nrow = nrow(pathways.mtx2), ncol = nrow(pathways.mtx2)))
+  }
 
   ############################################
   #---------User supplied function-----------#
@@ -254,27 +286,85 @@ CombineGeneSets <- function(Object, combineMethod="Standard", combineMethod.supp
   #######################################
   #---------standard function-----------#
   #######################################
+  RR.function <- function(x)
+  {
+    J <- x
+    I <- pathways.mtx[Disease1,]
+    N <- (ncol(pathways.mtx))#number of molecules
+
+    Pi <- sum(I)#number of molecules in pathway 1
+    Pj <- sum(J)#number of molecules in pathway 2
+
+    Cij <- sum(names(J)[J==1] %in% names(I)[I==1])
+
+    if(Cij == 1){Cij <- 0.1}#Adjusted for pathways with 1 molecules
+    RRij <- (Cij*N)/((Pi*Pj) - Cij)
+    return(RRij)
+  }
+
+  RR.function2 <- function(x)
+  {
+    J <- x
+    I <- pathways.mtx2[Disease1,]
+    N <- (ncol(pathways.mtx2))#number of molecules
+
+    Pi <- sum(I)#number of molecules in pathway 1
+    Pj <- sum(J)#number of molecules in pathway 2
+
+    Cij <- sum(names(J)[J==1] %in% names(I)[I==1])
+
+    if(Cij == 1){Cij <- 0.1}#Adjusted for pathways with 1 molecules
+    RRij <- (Cij*N)/((Pi*Pj) - Cij)
+    return(RRij)
+  }
 
   if(combineMethod=="Standard")
   {
-    for(Disease1 in 1:nrow(RR))
-    {
-      RR.function <- function(x)
+    if (threads == 1) {
+      for(Disease1 in 1:nrow(RR))
       {
-        J <- x
-        I <- pathways.mtx[Disease1,]
-        N <- (ncol(pathways.mtx))#number of molecules
-
-        Pi <- sum(I)#number of molecules in pathway 1
-        Pj <- sum(J)#number of molecules in pathway 2
-
-        Cij <- sum(names(J)[J==1] %in% names(I)[I==1])
-        if(Cij == 1){Cij <- 0.1}#Adjusted for pathways with 1 molecules
-        RRij <- (Cij*N)/((Pi*Pj) - Cij)
-        return(RRij)
+        RR[Disease1,] <- apply(X = pathways.mtx, MARGIN = 1, FUN = RR.function )
       }
-      RR[Disease1,] <- apply(X = pathways.mtx, MARGIN = 1, FUN = RR.function )
 
+      for(Disease1 in 1:nrow(RR2))
+      {
+        RR2[Disease1,] <- apply(X = pathways.mtx2, MARGIN = 1, FUN = RR.function2 )
+      }
+
+    } else {#parallelization
+        message(paste0("Parallelizing processes, ", threads, " cores have been selected. "), sep="")
+
+        if (threads > detectCores()) {
+          message("More cores have been selected than detected.")
+          threads <- detectCores()
+          message(paste0("The maximum number of cores will be used:", threads, " cores."))
+        }
+
+        cl <- makeCluster(threads)
+        registerDoParallel(cl)
+        foreach(Disease1=1:nrow(RR[])) %dopar% {
+
+          RR[Disease1,] <- apply(X = pathways.mtx, MARGIN = 1, FUN = RR.function )
+
+        }
+        stopCluster(cl)
+
+        cl <- makeCluster(threads)
+        registerDoParallel(cl)
+        foreach(Disease1=1:nrow(RR2[])) %dopar% {
+
+          RR2[Disease1,] <- apply(X = pathways.mtx2, MARGIN = 1, FUN = RR.function2 )
+
+        }
+        stopCluster(cl)
+
+        RR <- RR[]
+        rownames(RR) <-  pathways.i$RR_name
+        colnames(RR) <-  pathways.i$RR_name
+
+        RR2 <- RR2[]
+        rownames(RR2) <-  pathways.i2$RR_name
+        colnames(RR2) <-  pathways.i2$RR_name
     }
   }
   ######################################
@@ -283,7 +373,7 @@ CombineGeneSets <- function(Object, combineMethod="Standard", combineMethod.supp
 
   Object@Data <- list(pathways.i)
   Object@Data.RR <- as.data.frame(RR)
-
+  Object@DataPathways.RR <- as.data.frame(RR2)
 
 
   message("-----------------------------------------------------------")

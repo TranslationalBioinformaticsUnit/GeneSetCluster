@@ -4,8 +4,13 @@
 \alias{GetSTRINGdbPerGeneSets}
 \title{GetSTRINGdbPerGeneSets}
 \usage{
-GetSTRINGdbPerGeneSets(Object, unique.per.cluster = T,
-  plot.input = "All")
+GetSTRINGdbPerGeneSets(
+  Object,
+  unique.per.cluster = T,
+  plot.input = "All",
+  threshold = 100,
+  version = "11.5"
+)
 }
 \arguments{
 \item{Object}{A PathwayObject.}
@@ -13,6 +18,10 @@ GetSTRINGdbPerGeneSets(Object, unique.per.cluster = T,
 \item{unique.per.cluster}{A vector with strings of genes within each Gene-Set. Each string is seperated using the seperator supplied.}
 
 \item{plot.input}{A vector with group names of the different gene set experiments}
+
+\item{threshold}{A numeric for the threshold of the string analysis}
+
+\item{version}{Version of StringDB to run (currently 11.5)}
 }
 \value{
 a list with the string output and the prep for the plotting function PlotSTRINGdbPerGeneSets
@@ -42,5 +51,5 @@ IPA.object3 <- ClusterGeneSets(Object = IPA.object2,
                               method = "kmeans")
 StringObject_unique <- GetSTRINGdbPerGeneSets(Object = IPA.object3,
                                              unique.per.cluster = TRUE ,
-                                             plot.input = "All")
+                                             plot.input = "All", threshold =100, version = "11.5")
 }

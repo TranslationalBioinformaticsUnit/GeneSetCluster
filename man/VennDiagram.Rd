@@ -4,8 +4,17 @@
 \alias{VennDiagram}
 \title{VennDiagram}
 \usage{
-VennDiagram(n_groups = 4, Group1, Group2, Group3, Group4, names_groups,
-  main, legend = F, percentage = F)
+VennDiagram(
+  n_groups = 4,
+  Group1,
+  Group2,
+  Group3,
+  Group4,
+  names_groups,
+  main,
+  legend = F,
+  percentage = F
+)
 }
 \arguments{
 \item{n_groups}{The number of groups to compare.}

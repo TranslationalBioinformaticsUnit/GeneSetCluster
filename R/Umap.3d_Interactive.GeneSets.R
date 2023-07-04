@@ -1,23 +1,19 @@
-
+#' @import umap
+#' @import rgl
 Umap.RGL.GeneSets <- function(Object, main = "", labels = "", plot.legend = F, spheres = F)
 {
-  
-  library(umap)
-  #require(manipulateWidget)
-  library(rgl)
-
   clear3d()
   Object.umap <- umap(Object@Data.RR,n_components = 3, random_state = max(Object@Data[[1]]$cluster))
   umap.labels <- (Object@Data[[1]]$cluster)
-  
+
   colors=RColorBrewer::brewer.pal(n = length(unique(Object@Data[[1]]$cluster)), name = "Set1")
-  
-  
-  
+
+
+
   layout <- Object.umap$layout
   layout <- cbind(layout, Object@Data[[1]]$Pathways)
   layout <- as.data.frame(layout)
-  
+
   colnames(layout) <- c("Umap_D1", "Umap_D2", "umap_D3", "labels")
   layout$cluster <- Object@Data[[1]]$cluster
   if(spheres == T)
@@ -36,7 +32,7 @@ Umap.RGL.GeneSets <- function(Object, main = "", labels = "", plot.legend = F, s
     layout[!layout$labels %in% labels,"labels"] <- ""
     plotlabs <- text3d(layout[,1],layout[,2], layout[,3],  layout$labels,
                        type="p", col=as.integer(labels.u))
-    
+
   }
   if(plot.legend[1] ==T)
   {
@@ -44,6 +40,6 @@ Umap.RGL.GeneSets <- function(Object, main = "", labels = "", plot.legend = F, s
   }
 
   rglwidget(elementId = "plot3drgl" )
-  
+
 
 }

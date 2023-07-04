@@ -4,8 +4,18 @@
 \alias{ObjectCreator}
 \title{ObjectCreator}
 \usage{
-ObjectCreator(Pathways, Molecules, Groups, Source, Type, structure, sep,
-  organism = NA)
+ObjectCreator(
+  Pathways,
+  Molecules,
+  Groups,
+  Source,
+  Type,
+  structure,
+  sep,
+  organism = NA,
+  Pvalues = NA,
+  enrichmentScore = NA
+)
 }
 \arguments{
 \item{Pathways}{A vector with Gene-Set labels.}

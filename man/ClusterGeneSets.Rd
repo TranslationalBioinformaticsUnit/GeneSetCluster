@@ -4,8 +4,14 @@
 \alias{ClusterGeneSets}
 \title{ClusterGeneSets}
 \usage{
-ClusterGeneSets(Object, clusters = 5, method = "kmeans",
-  order = "group", molecular.signature = "All", user_function)
+ClusterGeneSets(
+  Object,
+  clusters = 5,
+  method = "kmeans",
+  order = "group",
+  molecular.signature = "All",
+  user_function
+)
 }
 \arguments{
 \item{Object}{A PathwayObject}

@@ -4,8 +4,15 @@
 \alias{PlotGeneSets}
 \title{PlotGeneSets}
 \usage{
-PlotGeneSets(Object, fontsize = 5, legend = T, annotation.mol = F,
-  main = "", RR.max = "", cluster.order = "")
+PlotGeneSets(
+  Object,
+  fontsize = 5,
+  legend = T,
+  annotation.mol = F,
+  main = "",
+  RR.max = "",
+  cluster.order = ""
+)
 }
 \arguments{
 \item{Object}{a pathway object}

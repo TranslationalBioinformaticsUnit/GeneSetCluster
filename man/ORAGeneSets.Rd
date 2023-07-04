@@ -4,7 +4,7 @@
 \alias{ORAGeneSets}
 \title{ORAGeneSets}
 \usage{
-ORAGeneSets(Object, ORA.returned = 10, unique.per.cluster = T)
+ORAGeneSets(Object, ORA.returned = 10, unique.per.cluster = T, check.error = F)
 }
 \arguments{
 \item{Object}{A PathwayObject.}
@@ -12,6 +12,8 @@ ORAGeneSets(Object, ORA.returned = 10, unique.per.cluster = T)
 \item{ORA.returned}{A numeric for how Go terms should be returned per analysis. Alternative use "All" to get all of them.}
 
 \item{unique.per.cluster}{A vector with strings of genes within each Gene-Set. Each string is seperated using the seperator supplied.}
+
+\item{check.error}{If check.error =T then the program will check to make sure the webgestaltR function will run or skip at the cost of preformance}
 }
 \value{
 a data frame with the over represented gene sets for all the clusters.
