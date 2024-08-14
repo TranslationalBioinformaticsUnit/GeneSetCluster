@@ -1,5 +1,7 @@
 # GeneSetCluster
 
+GeneSetCluster version 2.0 is available: https://github.com/TranslationalBioinformaticsUnit/GeneSetCluster2.0
+
 Gene-set analysis (GSA) tools aim to provide biological context by identifying gene-sets associated with a given trait or traits of interest. Gene-set analysis tools are frequently gene-centric, using as input results from studies using RNA-seq or microarrays data (e.g. Ingenuity or GSEA among many others), but it has also been adapted for interval-based analysis derived from data-types such as DNA methylation or ChIP/ATAC-seq. 
 
 Gene-sets are derived from knowledge bases which group genes on the basis of shared biological or functional properties; GSA tools provide, as a result, a list of significant gene-sets. However, while these results are useful for the researcher in the identification of major biological insights, they may be complex to interpret because many gene-sets have largely overlapping gene content or because the result consists of a large number of gene-sets making it complicated to identify the major biological insights. 
