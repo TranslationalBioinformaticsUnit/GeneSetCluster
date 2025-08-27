@@ -1,3 +1,9 @@
+
+**New version:** GeneSetCluster 2.0 is now available at [TranslationalBioinformaticsUnit/GeneSetCluster2.0](https://github.com/TranslationalBioinformaticsUnit/GeneSetCluster2.0).  
+For details on the methodology and applications, please refer to the scientific publication: [Ortega-Legarreta, A., Maillo,. et al. GeneSetCluster 2.0: a comprehensive toolset for summarizing and integrating gene-sets analysis. BMC Bioinformatics 26, 219 (2025)](https://doi.org/10.1186/s12859-020-03784-z).
+
+---
+
 # GeneSetCluster
 
 Gene-set analysis (GSA) tools aim to provide biological context by identifying gene-sets associated with a given trait or traits of interest. Gene-set analysis tools are frequently gene-centric, using as input results from studies using RNA-seq or microarrays data (e.g. Ingenuity or GSEA among many others), but it has also been adapted for interval-based analysis derived from data-types such as DNA methylation or ChIP/ATAC-seq. 
